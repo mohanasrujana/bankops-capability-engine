@@ -1,0 +1,33 @@
+# Installed dependencies
+node_modules/
+
+# Compiled output
+dist/
+
+# Test and coverage output
+coverage/
+playwright-report/
+test-results/
+
+# Local environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Temporary files and local logs
+*.log
+.tmp/
+.DS_Store
+
+# Python virtual environment and caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Python package and coverage output
+*.egg-info/
+.coverage
+htmlcov/
