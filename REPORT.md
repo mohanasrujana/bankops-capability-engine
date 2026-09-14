@@ -8,7 +8,7 @@ The planned system is a Python modular monolith with explicit discovery, artifac
 
 ## 2. Artifact schema
 
-The planned artifact declares identity, version, application compatibility, typed inputs and outputs, semantic actions, ordered locator candidates, bounded waits and retries, known outcomes, risk levels, and a final checkpoint. Details remain provisional until implemented and tested.
+Artifact models are immutable and reject unknown fields. Locator plans contain one or more discriminator-based candidates covering role, label, visible text, CSS, and coordinates. A coordinate locator can appear only once and only as the final fallback. The versioned artifact declares typed inputs and outputs, compatibility metadata, bounded actions, business outcomes, a success checkpoint, and execution policy. Cross-field validation rejects duplicate IDs, undeclared template inputs, incomplete or duplicate extraction mappings, disallowed action kinds, irreversible actions, and risky actions without an approval requirement.
 
 ## 3. Determinism & error handling
 

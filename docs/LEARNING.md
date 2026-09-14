@@ -47,3 +47,23 @@
 - Savings balances remain integer cents in the domain model.
 - Display formatting uses integer division and remainder rather than floating-point arithmetic.
 - This preserves exact values while still rendering a human-friendly amount such as `$4,250.75`.
+
+## Discriminated unions
+
+- Every locator contains a `kind` such as `role`, `label`, `css`, or `coordinate`.
+- Pydantic uses that discriminator to select the correct model and validation rules.
+- This is safer than one model containing many unrelated optional fields.
+
+## Strict artifact models
+
+- `extra="forbid"` rejects misspelled or invented fields instead of ignoring them.
+- `frozen=True` prevents a validated contract from being mutated accidentally.
+- Coordinate targeting is allowed only as one final fallback because it is the least stable targeting strategy.
+
+## Cross-field contract validation
+
+- Field validation answers questions such as “is this timeout within bounds?”
+- Cross-field validation answers questions such as “does this fill step reference an input the artifact actually declares?”
+- An output declaration alone does not produce a value, so each declared output must map to exactly one extraction step.
+- The action allowlist is stored with the artifact and checked against every step, making its execution envelope explicit during review.
+- Irreversible actions are excluded from reusable artifacts; risky actions must advertise an approval requirement before replay can accept the contract.

@@ -13,12 +13,12 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 ## Capability artifact
 
 - [ ] **ART-01:** Emit a typed and serializable artifact after successful discovery.
-- [ ] **ART-02:** Record ordered actions independently of the raw LLM transcript.
-- [ ] **ART-03:** Represent robust target locators.
-- [ ] **ART-04:** Declare typed input parameters.
-- [ ] **ART-05:** Declare typed outputs and extraction rules.
-- [ ] **ART-06:** Include a checkpoint or success condition.
-- [ ] **ART-07:** Version artifacts for human review and future migration.
+- [x] **ART-02:** Record ordered actions independently of the raw LLM transcript.
+- [x] **ART-03:** Represent robust target locators.
+- [x] **ART-04:** Declare typed input parameters.
+- [x] **ART-05:** Declare typed outputs and extraction rules.
+- [x] **ART-06:** Include a checkpoint or success condition.
+- [x] **ART-07:** Version artifacts for human review and future migration.
 
 ## Deterministic replay
 

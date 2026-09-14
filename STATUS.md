@@ -1,10 +1,10 @@
 # Project Status
 
-Last updated: 2026-09-09
+Last updated: 2026-09-14
 
 ## Current milestone
 
-M0 — Establish and verify the Python foundation
+M1 — Define the reusable capability contract
 
 ## Done
 
@@ -25,12 +25,15 @@ M0 — Establish and verify the Python foundation
 - Implemented and tested a separate member-detail page that displays the formatted savings balance.
 - Replaced member IDs in detail URLs with opaque LedgerDesk record identifiers.
 - Verified the complete LedgerDesk success and not-found flows in Chromium through Playwright.
+- Implemented strict typed locator candidates and ordered locator plans for capability artifacts.
+- Implemented typed actions, inputs, outputs, business outcomes, compatibility metadata, checkpoints, versioning, and execution policy.
+- Added cross-field validation for unique identifiers, declared input references, complete output extraction, action allowlisting, and risk constraints.
 - Recreated the project-identity behavior in Python and passed formatting, linting, strict typing, and two tests.
 - Installed and verified the Python runtime/development dependencies in the isolated environment.
 
 ## Next
 
-- Build LedgerDesk, capability contracts, deterministic replay, safety/evidence, LLM discovery, and same-session handoff.
+- Save a reviewed LedgerDesk artifact instance, then build deterministic replay against it.
 
 ## Blocked
 
@@ -41,7 +44,7 @@ M0 — Establish and verify the Python foundation
 
 - Local repository: `/Users/satyasrujanapilli/Downloads/bankops-capability-engine`.
 - Git remote: `https://github.com/mohanasrujana/bankops-capability-engine.git`.
-- Local `main` and `origin/main` both point to Python-first commit `c32947c`.
+- Local `main` and `origin/main` both point to LedgerDesk-flow commit `b13fe41`; the capability-contract work is not yet committed.
 - Python baseline evidence: dependency validation, Ruff formatting and lint, strict mypy, and six pytest tests passed.
 - LedgerDesk domain evidence: all six expected Python tests were collected and passed.
 - LedgerDesk health-endpoint evidence: seven total tests passed; the known Starlette/AnyIO warning is narrowly mitigated and documented.
@@ -49,6 +52,8 @@ M0 — Establish and verify the Python foundation
 - Member-search outcome evidence: eleven total tests passed with Ruff, mypy, and whitespace checks.
 - Complete HTTP-flow evidence: sixteen tests passed for search, result navigation, detail extraction, safe record lookup, and currency formatting.
 - Browser evidence: success reached Member Details with `$4,250.75`, not-found rendered without an Open Member link, console errors were empty, and the legacy layout had no visible clipping or overlap.
+- Locator-schema evidence: 21 total tests passed, including discriminator parsing, unknown-field rejection, and coordinate-fallback constraints.
+- Capability-contract evidence: 32 intended tests were collected and passed, including action parsing and cross-field safety checks.
 - `pip check` reported no broken requirements; FastAPI, Jinja2, OpenAI, Playwright, Pydantic, and Uvicorn imported successfully.
 
 ## Working agreement

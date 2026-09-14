@@ -96,3 +96,45 @@
 - Browser console reported no errors.
 - Server logs showed expected GET/POST/GET requests with HTTP 200 responses.
 - Screenshot review showed a readable legacy layout without clipping or overlap.
+
+## 2026-09-14 — Artifact locator contract
+
+### Completed
+
+- Added strict immutable locator models for role, label, text, CSS, and coordinates.
+- Added discriminator-based parsing using the `kind` field.
+- Added ordered locator plans with at least one candidate.
+- Required coordinate targeting to be a single final fallback.
+
+### Reasoning
+
+- Semantic locators are easier to review and more robust than coordinates.
+- CSS remains a constrained structural fallback for legacy surfaces.
+- Coordinates remain representable for hostile surfaces but cannot silently outrank stronger evidence.
+- Unknown fields are rejected so schema typos do not become ignored safety or replay instructions.
+
+### Verification
+
+- Ruff, strict mypy, all 21 tests, and whitespace checks passed.
+
+## 2026-09-14 — Complete capability contract
+
+### Completed
+
+- Added a bounded replay vocabulary for fill, click, wait, and extract actions.
+- Added typed input and output declarations, application compatibility, business outcomes, a final success checkpoint, schema and capability versions, and execution policy.
+- Enforced unique names and step IDs across the artifact.
+- Required fill templates to reference declared inputs and every declared output to have exactly one extraction step.
+- Required policy allowlisting for every action, blocked irreversible actions, and required approval policy for risky actions.
+
+### Design choices
+
+- Replay actions are a small discriminated union rather than arbitrary browser code so they remain deterministic and auditable.
+- Timeouts are bounded from 100 to 30,000 milliseconds so a malformed artifact cannot wait forever.
+- Business outcomes have their own checkpoints so expected conditions such as member-not-found are distinct from automation failures.
+- Artifact validation checks relationships between fields, because individually valid fields can still form an unsafe or unexecutable contract.
+
+### Verification
+
+- The first gate exposed one test import-order violation and two formatting differences; Ruff corrected these mechanical issues.
+- All 32 intended tests were collected and passed before the final complete quality gate.
