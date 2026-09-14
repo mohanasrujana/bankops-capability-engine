@@ -13,6 +13,7 @@ dependencies = [
     "openai",
     "playwright",
     "pydantic",
+    "python-multipart",
     "uvicorn",
 ]
 
@@ -31,6 +32,9 @@ include = ["bankops*", "ledgerdesk*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["-ra", "--strict-config", "--strict-markers"]
+filterwarnings = [
+    'ignore:The anyio\.abc\.BlockingPortal alias is deprecated.*:DeprecationWarning:starlette\.testclient',
+]
 
 [tool.ruff]
 target-version = "py312"

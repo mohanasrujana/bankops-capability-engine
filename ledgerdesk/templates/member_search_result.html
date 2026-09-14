@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ application_name }} — Search Result</title>
+  </head>
+  <body>
+    <table width="760" border="1" cellspacing="0" cellpadding="8">
+      <tr>
+        <td>
+          <h1>{{ application_name }}</h1>
+          <p>Member Services Console</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {% if result.status == "found" %}
+            <h2>Member Found</h2>
+            <table border="1" cellspacing="0" cellpadding="6">
+              <tr>
+                <th scope="row">Member ID</th>
+                <td>{{ result.member.id }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Name</th>
+                <td>{{ result.member.display_name }}</td>
+              </tr>
+            </table>
+            <p>
+              <a href="/members/{{ result.member.record_id }}">Open Member</a>
+            </p>
+          {% elif result.status == "not_found" %}
+            <h2>Member Not Found</h2>
+            <p>No member matched the supplied synthetic identifier.</p>
+          {% else %}
+            <h2>Invalid Member ID</h2>
+            <ul>
+              {% for issue in result.issues %}
+                <li>{{ issue }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          <p><a href="/">Return to Member Search</a></p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

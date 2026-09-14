@@ -12,6 +12,7 @@ class MemberIdInput(BaseModel):
 class Member(BaseModel):
     model_config = ConfigDict(frozen=True)
 
+    record_id: str
     id: str
     display_name: str
     savings_balance_cents: int = Field(ge=0)
@@ -37,11 +38,13 @@ type LookupResult = FoundResult | NotFoundResult | InvalidInputResult
 
 _MEMBERS: dict[str, Member] = {
     "M-10001": Member(
+        record_id="rec-a7f3c2",
         id="M-10001",
         display_name="Synthetic Member 10001",
         savings_balance_cents=425_075,
     ),
     "M-10002": Member(
+        record_id="rec-d9b821",
         id="M-10002",
         display_name="Synthetic Member 10002",
         savings_balance_cents=98_750,
@@ -63,3 +66,18 @@ def lookup_member(raw_member_id: object) -> LookupResult:
         return NotFoundResult(member_id=request.member_id)
 
     return FoundResult(member=member)
+
+
+def lookup_member_record(record_id: str) -> Member | None:
+    return next(
+        (member for member in _MEMBERS.values() if member.record_id == record_id),
+        None,
+    )
+
+
+def format_usd(cents: int) -> str:
+    if cents < 0:
+        raise ValueError("Currency amount cannot be negative")
+
+    dollars, remaining_cents = divmod(cents, 100)
+    return f"${dollars:,}.{remaining_cents:02d}"

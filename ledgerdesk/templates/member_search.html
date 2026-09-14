@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ application_name }} — Member Services</title>
+  </head>
+  <body>
+    <table width="760" border="1" cellspacing="0" cellpadding="8">
+      <tr>
+        <td>
+          <h1>{{ application_name }}</h1>
+          <p>Member Services Console</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h2>Member Search</h2>
+
+          <form action="/members/search" method="post">
+            <p>
+              <label for="member-id">Member ID</label>
+              <input
+                id="member-id"
+                name="member_id"
+                type="text"
+                pattern="M-[0-9]{5}"
+                placeholder="M-10001"
+                required
+              >
+              <button type="submit">Search</button>
+            </p>
+          </form>
+
+          <p>Use synthetic member identifiers only.</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
