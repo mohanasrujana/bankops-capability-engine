@@ -71,7 +71,7 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 - [ ] **DEL-01:** Publish the source in a public Git repository.
 - [ ] **DEL-02:** Provide setup and exact demo commands in `/README.md`.
 - [ ] **DEL-03:** Provide `/REPORT.md` using the seven required headings.
-- [ ] **DEL-04:** Store a saved example artifact under `/evidence/`.
+- [x] **DEL-04:** Store a saved example artifact under `/evidence/`.
 - [ ] **DEL-05:** Store discovery and replay logs under `/evidence/`.
 - [ ] **DEL-06:** Demonstrate at least one exceptional replay outcome.
 - [ ] **DEL-07:** Keep secrets and real PII out of the repository.

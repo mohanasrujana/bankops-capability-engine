@@ -10,6 +10,8 @@ The planned system is a Python modular monolith with explicit discovery, artifac
 
 Artifact models are immutable and reject unknown fields. Locator plans contain one or more discriminator-based candidates covering role, label, visible text, CSS, and coordinates. A coordinate locator can appear only once and only as the final fallback. The versioned artifact declares typed inputs and outputs, compatibility metadata, bounded actions, business outcomes, a success checkpoint, and execution policy. Cross-field validation rejects duplicate IDs, undeclared template inputs, incomplete or duplicate extraction mappings, disallowed action kinds, irreversible actions, and risky actions without an approval requirement.
 
+The repository includes a validated, hand-reviewed LedgerDesk seed artifact for the member-savings workflow. It is intentionally identified as replay input rather than claimed as LLM discovery evidence; the genuine discovery run will emit the same schema later.
+
 ## 3. Determinism & error handling
 
 Replay will validate artifacts and inputs, execute bounded steps, and return `success`, `business_outcome`, `intervention_required`, or `failure`. Recoverable conditions use bounded recorded recovery. Verified details will replace this plan after implementation.

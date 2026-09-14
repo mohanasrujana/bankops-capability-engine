@@ -67,3 +67,10 @@
 - An output declaration alone does not produce a value, so each declared output must map to exactly one extraction step.
 - The action allowlist is stored with the artifact and checked against every step, making its execution envelope explicit during review.
 - Irreversible actions are excluded from reusable artifacts; risky actions must advertise an approval requirement before replay can accept the contract.
+
+## Seed artifact versus discovered artifact
+
+- A seed artifact is deliberately authored from a known, reviewed workflow so replay can be built and tested independently.
+- A discovered artifact is emitted after an LLM observes and successfully operates the live UI.
+- Both use exactly the same schema, but only the second proves the assignment's discovery requirement.
+- Keeping these claims separate lets us develop replay before spending model calls while preserving honest evidence boundaries.

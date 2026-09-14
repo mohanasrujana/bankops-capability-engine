@@ -28,12 +28,13 @@ M1 — Define the reusable capability contract
 - Implemented strict typed locator candidates and ordered locator plans for capability artifacts.
 - Implemented typed actions, inputs, outputs, business outcomes, compatibility metadata, checkpoints, versioning, and execution policy.
 - Added cross-field validation for unique identifiers, declared input references, complete output extraction, action allowlisting, and risk constraints.
+- Saved and contract-validated the first LedgerDesk member-savings capability artifact under `evidence/artifacts/`.
 - Recreated the project-identity behavior in Python and passed formatting, linting, strict typing, and two tests.
 - Installed and verified the Python runtime/development dependencies in the isolated environment.
 
 ## Next
 
-- Save a reviewed LedgerDesk artifact instance, then build deterministic replay against it.
+- Build deterministic replay against the reviewed LedgerDesk artifact.
 
 ## Blocked
 
@@ -54,6 +55,7 @@ M1 — Define the reusable capability contract
 - Browser evidence: success reached Member Details with `$4,250.75`, not-found rendered without an Open Member link, console errors were empty, and the legacy layout had no visible clipping or overlap.
 - Locator-schema evidence: 21 total tests passed, including discriminator parsing, unknown-field rejection, and coordinate-fallback constraints.
 - Capability-contract evidence: 32 intended tests were collected and passed, including action parsing and cross-field safety checks.
+- Saved-artifact evidence: 33 intended tests passed, including loading the repository JSON through the production Pydantic contract.
 - `pip check` reported no broken requirements; FastAPI, Jinja2, OpenAI, Playwright, Pydantic, and Uvicorn imported successfully.
 
 ## Working agreement

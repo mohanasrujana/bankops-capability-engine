@@ -1,0 +1,213 @@
+{
+  "schema_version": "1.0",
+  "capability_id": "lookup-member-savings-balance",
+  "capability_version": 1,
+  "description": "Look up a synthetic LedgerDesk member and return the displayed savings balance.",
+  "compatibility": {
+    "application": "LedgerDesk",
+    "family": "ledgerdesk-local",
+    "entrypoint": "http://127.0.0.1:8000/"
+  },
+  "inputs": [
+    {
+      "name": "member_id",
+      "value_type": "string",
+      "description": "Synthetic LedgerDesk member identifier in M-00000 format.",
+      "required": true,
+      "sensitive": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "savings_balance",
+      "value_type": "string",
+      "description": "Savings balance exactly as displayed by LedgerDesk.",
+      "sensitive": true
+    }
+  ],
+  "steps": [
+    {
+      "kind": "fill",
+      "id": "enter-member-id",
+      "description": "Enter the invocation member ID in the search field.",
+      "target": {
+        "candidates": [
+          {
+            "kind": "label",
+            "label": "Member ID"
+          },
+          {
+            "kind": "css",
+            "selector": "input[name='member_id']"
+          }
+        ]
+      },
+      "value_template": "{{ inputs.member_id }}",
+      "risk": "reversible",
+      "timeout_ms": 5000
+    },
+    {
+      "kind": "click",
+      "id": "submit-member-search",
+      "description": "Submit the member search.",
+      "target": {
+        "candidates": [
+          {
+            "kind": "role",
+            "role": "button",
+            "name": "Search"
+          },
+          {
+            "kind": "text",
+            "text": "Search"
+          }
+        ]
+      },
+      "risk": "reversible",
+      "timeout_ms": 5000
+    },
+    {
+      "kind": "wait_for",
+      "id": "wait-for-open-member",
+      "description": "Wait for the matching member result to become actionable.",
+      "target": {
+        "candidates": [
+          {
+            "kind": "role",
+            "role": "link",
+            "name": "Open Member"
+          }
+        ]
+      },
+      "state": "visible",
+      "risk": "safe",
+      "timeout_ms": 5000
+    },
+    {
+      "kind": "click",
+      "id": "open-member",
+      "description": "Open the matching member record.",
+      "target": {
+        "candidates": [
+          {
+            "kind": "role",
+            "role": "link",
+            "name": "Open Member"
+          }
+        ]
+      },
+      "risk": "reversible",
+      "timeout_ms": 5000
+    },
+    {
+      "kind": "wait_for",
+      "id": "wait-for-savings-balance",
+      "description": "Wait for the savings balance to be displayed.",
+      "target": {
+        "candidates": [
+          {
+            "kind": "label",
+            "label": "Savings Balance"
+          },
+          {
+            "kind": "css",
+            "selector": "output[aria-label='Savings Balance']"
+          }
+        ]
+      },
+      "state": "visible",
+      "risk": "safe",
+      "timeout_ms": 5000
+    },
+    {
+      "kind": "extract",
+      "id": "extract-savings-balance",
+      "description": "Read the displayed savings balance.",
+      "target": {
+        "candidates": [
+          {
+            "kind": "label",
+            "label": "Savings Balance"
+          },
+          {
+            "kind": "css",
+            "selector": "output[aria-label='Savings Balance']"
+          }
+        ]
+      },
+      "output_name": "savings_balance",
+      "source": "text",
+      "risk": "safe",
+      "timeout_ms": 5000
+    }
+  ],
+  "outcomes": [
+    {
+      "code": "member_not_found",
+      "description": "No member matched the supplied synthetic identifier.",
+      "checkpoint": {
+        "kind": "element",
+        "target": {
+          "candidates": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Member Not Found"
+            }
+          ]
+        },
+        "state": "visible",
+        "timeout_ms": 1000
+      }
+    },
+    {
+      "code": "invalid_member_id",
+      "description": "LedgerDesk rejected the member identifier format.",
+      "checkpoint": {
+        "kind": "element",
+        "target": {
+          "candidates": [
+            {
+              "kind": "role",
+              "role": "heading",
+              "name": "Invalid Member ID"
+            }
+          ]
+        },
+        "state": "visible",
+        "timeout_ms": 1000
+      }
+    }
+  ],
+  "success_checkpoint": {
+    "kind": "element",
+    "target": {
+      "candidates": [
+        {
+          "kind": "label",
+          "label": "Savings Balance"
+        },
+        {
+          "kind": "css",
+          "selector": "output[aria-label='Savings Balance']"
+        }
+      ]
+    },
+    "state": "visible",
+    "timeout_ms": 5000
+  },
+  "policy": {
+    "allowed_action_kinds": [
+      "click",
+      "extract",
+      "fill",
+      "wait_for"
+    ],
+    "allowed_url_prefixes": [
+      "http://127.0.0.1:8000/"
+    ],
+    "require_approval_for": [
+      "risky"
+    ]
+  }
+}

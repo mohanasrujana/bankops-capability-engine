@@ -138,3 +138,25 @@
 
 - The first gate exposed one test import-order violation and two formatting differences; Ruff corrected these mechanical issues.
 - All 32 intended tests were collected and passed before the final complete quality gate.
+
+## 2026-09-14 — Saved LedgerDesk capability
+
+### Completed
+
+- Added `evidence/artifacts/ledgerdesk-member-savings-balance.v1.json`.
+- Recorded the six-step success path: fill, search, wait for result, open member, wait for balance, and extract.
+- Recorded member-not-found and invalid-member-ID as expected business outcomes.
+- Marked the member ID and savings-balance output as sensitive metadata for the future redaction layer.
+- Added an integration test that loads the repository artifact through `CapabilityArtifact` and checks its ordered steps and outcomes.
+
+### Design choices
+
+- The first artifact is a hand-reviewed seed based on the browser flow already verified in Chromium.
+- It is valid replay input and deliverable evidence, but it is not presented as discovery output; ART-01 remains open until a genuine LLM run emits an artifact.
+- Semantic role and label locators come first, with CSS used only as a structural fallback where helpful.
+- Explicit wait steps make expected state transitions visible instead of depending only on implicit browser timing.
+
+### Verification
+
+- The JSON parsed through the strict production artifact contract.
+- All 33 intended tests passed; Ruff identified and mechanically corrected one test import-grouping issue.
