@@ -74,3 +74,16 @@
 - A discovered artifact is emitted after an LLM observes and successfully operates the live UI.
 - Both use exactly the same schema, but only the second proves the assignment's discovery requirement.
 - Keeping these claims separate lets us develop replay before spending model calls while preserving honest evidence boundaries.
+
+## Dependency inversion through a surface adapter
+
+- The replay engine understands workflow semantics but does not import Playwright.
+- A `SurfaceAdapter` protocol states the operations replay needs without dictating how a browser or desktop tool performs them.
+- A fake adapter makes orchestration tests fast and deterministic; the real Playwright adapter will separately prove browser behavior.
+- This is dependency inversion: the high-level replay policy defines the interface, and low-level UI technology implements it.
+
+## URL allowlisting
+
+- Raw `startswith` URL checks are unsafe because an attacker-controlled hostname can begin with trusted-looking text.
+- Replay parses the URL and compares scheme and network location before checking the permitted path prefix.
+- Rejected entrypoints fail before navigation, which keeps the unsafe request outside the surface boundary.

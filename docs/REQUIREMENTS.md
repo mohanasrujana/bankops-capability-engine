@@ -23,18 +23,18 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 ## Deterministic replay
 
 - [ ] **REP-01:** Replay a saved artifact without LLM decision-making.
-- [ ] **REP-02:** Substitute invocation parameters safely.
+- [x] **REP-02:** Substitute invocation parameters safely.
 - [ ] **REP-03:** Wait for and verify expected UI states.
 - [ ] **REP-04:** Verify the final checkpoint.
 - [ ] **REP-05:** Return declared outputs in a structured result.
 
 ## Errors and outcomes
 
-- [ ] **ERR-01:** Represent successful completion separately from errors.
-- [ ] **ERR-02:** Represent expected business outcomes such as "member not found."
+- [x] **ERR-01:** Represent successful completion separately from errors.
+- [x] **ERR-02:** Represent expected business outcomes such as "member not found."
 - [ ] **ERR-03:** Detect and retry explicitly recoverable conditions.
-- [ ] **ERR-04:** Stop with debuggable context on hard failures.
-- [ ] **ERR-05:** Identify the failed step, expectation, and observation.
+- [x] **ERR-04:** Stop with debuggable context on hard failures.
+- [x] **ERR-05:** Identify the failed step, expectation, and observation.
 
 ## Safety
 

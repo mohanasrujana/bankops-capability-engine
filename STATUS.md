@@ -29,12 +29,15 @@ M1 — Define the reusable capability contract
 - Implemented typed actions, inputs, outputs, business outcomes, compatibility metadata, checkpoints, versioning, and execution policy.
 - Added cross-field validation for unique identifiers, declared input references, complete output extraction, action allowlisting, and risk constraints.
 - Saved and contract-validated the first LedgerDesk member-savings capability artifact under `evidence/artifacts/`.
+- Implemented the surface-independent deterministic replay core with typed results and failures.
+- Validated invocation types, safely bound declared inputs, enforced the entrypoint allowlist, detected business outcomes, and verified final checkpoints.
+- Accepted ADR-002 defining ownership between replay semantics and UI-specific adapters.
 - Recreated the project-identity behavior in Python and passed formatting, linting, strict typing, and two tests.
 - Installed and verified the Python runtime/development dependencies in the isolated environment.
 
 ## Next
 
-- Build deterministic replay against the reviewed LedgerDesk artifact.
+- Implement the Playwright surface adapter and run the reviewed artifact against live LedgerDesk.
 
 ## Blocked
 
@@ -56,6 +59,7 @@ M1 — Define the reusable capability contract
 - Locator-schema evidence: 21 total tests passed, including discriminator parsing, unknown-field rejection, and coordinate-fallback constraints.
 - Capability-contract evidence: 32 intended tests were collected and passed, including action parsing and cross-field safety checks.
 - Saved-artifact evidence: 33 intended tests passed, including loading the repository JSON through the production Pydantic contract.
+- Replay-core evidence: 39 intended tests passed, including success, business outcome, invalid invocation, allowlist rejection, surface failure context, and missing final checkpoint.
 - `pip check` reported no broken requirements; FastAPI, Jinja2, OpenAI, Playwright, Pydantic, and Uvicorn imported successfully.
 
 ## Working agreement

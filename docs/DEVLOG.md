@@ -160,3 +160,27 @@
 
 - The JSON parsed through the strict production artifact contract.
 - All 33 intended tests passed; Ruff identified and mechanically corrected one test import-grouping issue.
+
+## 2026-09-14 — Deterministic replay core
+
+### Completed
+
+- Added typed replay statuses, outputs, and debuggable error details.
+- Added invocation validation for required, unknown, and incorrectly typed values.
+- Added exact template binding for declared artifact inputs.
+- Added origin-aware entrypoint allowlisting rather than unsafe raw string-prefix trust.
+- Added deterministic dispatch for fill, click, wait, and extract steps.
+- Added business-outcome checks after each completed step and final success-checkpoint enforcement.
+- Added a UI-independent asynchronous `SurfaceAdapter` protocol and accepted ADR-002.
+
+### Verification
+
+- Fake-surface tests prove ordered operations without browser or model decisions.
+- Failure tests preserve completed steps, the failed step ID, expected state, and observed state.
+- A malicious lookalike host such as `127.0.0.1:8000.evil.test` is rejected before navigation.
+- All 39 intended tests, Ruff, strict mypy, and whitespace checks passed.
+
+### Next
+
+- Implement locator fallback and UI operations in the Playwright adapter.
+- Verify success and member-not-found replay against live LedgerDesk.

@@ -1,0 +1,23 @@
+from typing import Protocol
+
+from bankops.artifacts.models import Checkpoint, LocatorPlan
+
+
+class SurfaceError(Exception):
+    """A debuggable failure reported by a surface implementation."""
+
+
+class SurfaceAdapter(Protocol):
+    async def navigate(self, url: str) -> None: ...
+
+    async def fill(self, target: LocatorPlan, value: str, timeout_ms: int) -> None: ...
+
+    async def click(self, target: LocatorPlan, timeout_ms: int) -> None: ...
+
+    async def wait_for(self, target: LocatorPlan, state: str, timeout_ms: int) -> None: ...
+
+    async def extract(self, target: LocatorPlan, source: str, timeout_ms: int) -> str: ...
+
+    async def checkpoint_is_met(self, checkpoint: Checkpoint) -> bool: ...
+
+    async def wait_for_checkpoint(self, checkpoint: Checkpoint) -> bool: ...

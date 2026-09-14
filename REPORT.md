@@ -14,7 +14,7 @@ The repository includes a validated, hand-reviewed LedgerDesk seed artifact for 
 
 ## 3. Determinism & error handling
 
-Replay will validate artifacts and inputs, execute bounded steps, and return `success`, `business_outcome`, `intervention_required`, or `failure`. Recoverable conditions use bounded recorded recovery. Verified details will replace this plan after implementation.
+The surface-independent replay engine validates invocation inputs, binds declared parameters, enforces an origin-aware URL allowlist, executes the artifact's bounded ordered steps, checks declared business outcomes, verifies the final checkpoint, and returns typed `success`, `business_outcome`, `intervention_required`, or `failure` results. Failures retain completed steps, the failed step ID, and expected-versus-observed context. The core has no LLM dependency; live-browser proof awaits the Playwright adapter.
 
 ## 4. Heterogeneity & multi-tenant
 
