@@ -184,3 +184,26 @@
 
 - Implement locator fallback and UI operations in the Playwright adapter.
 - Verify success and member-not-found replay against live LedgerDesk.
+
+## 2026-09-14 — Playwright surface adapter
+
+### Completed
+
+- Mapped role, label, visible-text, and CSS artifact locators to Playwright locators.
+- Implemented ordered locator fallback for fill, click, wait, and extraction.
+- Implemented element and regular-expression URL checkpoints.
+- Restricted coordinate fallback to click operations with exact viewport and in-bounds validation.
+- Normalized exhausted locator attempts and invalid URL patterns into `SurfaceError`.
+- Ensured a missing final element checkpoint returns `False` for replay classification.
+
+### Bugs and verification conditions
+
+- Fixed BUG-003 by handling Playwright's optional viewport before coordinate access.
+- Initial Chromium launches failed because the macOS sandbox denied Mach-port registration; rerunning the same tests with browser execution permission succeeded.
+- This sandbox failure was an environment restriction, not an adapter assertion failure.
+
+### Verification
+
+- Real Chromium proved ordered CSS fallback after a missing semantic label.
+- Real Chromium proved accessible-role clicking, labeled extraction, element and URL checkpoints, coordinate mismatch rejection, and missing-checkpoint behavior.
+- All 44 intended tests passed after the adapter regression test was added.

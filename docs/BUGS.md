@@ -25,3 +25,15 @@ Only issues affecting behavior, correctness, safety, maintainability, developer 
 - **Fix:** Added an exact pytest filter matching only the dependency module, warning category, and message.
 - **Prevention:** Keep exact dependency versions recorded and review or remove the filter when Starlette updates the reference.
 - **Evidence:** All seven tests passed without a warnings summary; Ruff and strict mypy also passed.
+
+## BUG-003: Coordinate validation treated an optional viewport as always present
+
+- **Status:** Fixed
+- **Discovered:** 2026-09-14
+- **Severity:** Safety and typing defect
+- **Symptom:** Strict mypy rejected indexing `page.viewport_size` because Playwright may return `None`.
+- **Cause:** The initial comparison against an expected dictionary did not narrow Playwright's optional viewport type.
+- **Impact:** Coordinate fallback could not be proven safe for pages without an explicit viewport.
+- **Fix:** Explicitly reject a missing viewport before checking its width, height, and coordinate bounds.
+- **Prevention:** Keep strict typing enabled and test coordinate fallback against a mismatched viewport.
+- **Evidence:** Strict mypy passed, and real-Chromium integration testing confirmed viewport mismatch raises `SurfaceError` without clicking.

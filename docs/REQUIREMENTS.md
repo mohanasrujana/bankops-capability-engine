@@ -24,7 +24,7 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 
 - [ ] **REP-01:** Replay a saved artifact without LLM decision-making.
 - [x] **REP-02:** Substitute invocation parameters safely.
-- [ ] **REP-03:** Wait for and verify expected UI states.
+- [x] **REP-03:** Wait for and verify expected UI states.
 - [ ] **REP-04:** Verify the final checkpoint.
 - [ ] **REP-05:** Return declared outputs in a structured result.
 
@@ -61,7 +61,7 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 
 ## Extensibility design
 
-- [ ] **EXT-01:** Separate surface-specific perception and actions from artifact semantics.
+- [x] **EXT-01:** Separate surface-specific perception and actions from artifact semantics.
 - [ ] **EXT-02:** Explain extension to legacy web and desktop applications.
 - [ ] **EXT-03:** Explain artifact reuse across tenants using the same vendor application.
 - [ ] **EXT-04:** Explain tenant-specific overrides and version drift detection.

@@ -87,3 +87,16 @@
 - Raw `startswith` URL checks are unsafe because an attacker-controlled hostname can begin with trusted-looking text.
 - Replay parses the URL and compares scheme and network location before checking the permitted path prefix.
 - Rejected entrypoints fail before navigation, which keeps the unsafe request outside the surface boundary.
+
+## Playwright locator fallback
+
+- The adapter attempts locator candidates in artifact order and stops at the first successful operation.
+- Accessibility-based roles and labels are preferred because they describe user-visible intent; CSS remains useful for structurally stable legacy markup.
+- Playwright exceptions are translated into `SurfaceError`, keeping library-specific errors outside replay semantics.
+- A missing checkpoint is an observed false condition, while an invalid checkpoint pattern is a malformed instruction; those cases must not be conflated.
+
+## Coordinate safety
+
+- A coordinate has meaning only relative to the viewport in which it was recorded.
+- The adapter refuses a coordinate click if the current viewport is absent or differs from the recorded dimensions.
+- It also verifies that the point lies inside those dimensions, preferring a safe failure over an unintended click.

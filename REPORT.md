@@ -14,11 +14,11 @@ The repository includes a validated, hand-reviewed LedgerDesk seed artifact for 
 
 ## 3. Determinism & error handling
 
-The surface-independent replay engine validates invocation inputs, binds declared parameters, enforces an origin-aware URL allowlist, executes the artifact's bounded ordered steps, checks declared business outcomes, verifies the final checkpoint, and returns typed `success`, `business_outcome`, `intervention_required`, or `failure` results. Failures retain completed steps, the failed step ID, and expected-versus-observed context. The core has no LLM dependency; live-browser proof awaits the Playwright adapter.
+The surface-independent replay engine validates invocation inputs, binds declared parameters, enforces an origin-aware URL allowlist, executes the artifact's bounded ordered steps, checks declared business outcomes, verifies the final checkpoint, and returns typed `success`, `business_outcome`, `intervention_required`, or `failure` results. Failures retain completed steps, the failed step ID, and expected-versus-observed context. The core has no LLM dependency. A Playwright adapter now implements ordered semantic and CSS locator fallback, bounded UI operations, extraction, checkpoints, and viewport-validated coordinate clicks; end-to-end saved-artifact replay is the next evidence gate.
 
 ## 4. Heterogeneity & multi-tenant
 
-The planned `SurfaceAdapter` separates semantic actions from browser execution. Application-family metadata and tenant-specific overrides will allow reuse without claiming that desktop or production multi-tenant infrastructure is implemented.
+`SurfaceAdapter` separates semantic actions from browser execution, and the Playwright implementation proves the boundary against Chromium. Application-family metadata and planned tenant-specific overrides allow reuse without claiming that desktop or production multi-tenant infrastructure is implemented.
 
 ## 5. Escalation & handoff
 
