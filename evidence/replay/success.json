@@ -1,0 +1,23 @@
+{
+  "recorded_at": "2026-09-15T19:30:50.064806Z",
+  "schema_version": "1.0",
+  "capability_id": "lookup-member-savings-balance",
+  "capability_version": 1,
+  "status": "success",
+  "inputs": {
+    "member_id": "[REDACTED]"
+  },
+  "outputs": {
+    "savings_balance": "[REDACTED]"
+  },
+  "outcome_code": null,
+  "completed_step_ids": [
+    "enter-member-id",
+    "submit-member-search",
+    "wait-for-open-member",
+    "open-member",
+    "wait-for-savings-balance",
+    "extract-savings-balance"
+  ],
+  "error": null
+}

@@ -1,0 +1,17 @@
+{
+  "recorded_at": "2026-09-15T19:30:48.173255Z",
+  "schema_version": "1.0",
+  "capability_id": "lookup-member-savings-balance",
+  "capability_version": 1,
+  "status": "business_outcome",
+  "inputs": {
+    "member_id": "[REDACTED]"
+  },
+  "outputs": {},
+  "outcome_code": "member_not_found",
+  "completed_step_ids": [
+    "enter-member-id",
+    "submit-member-search"
+  ],
+  "error": null
+}

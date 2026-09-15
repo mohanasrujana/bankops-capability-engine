@@ -207,3 +207,26 @@
 - Real Chromium proved ordered CSS fallback after a missing semantic label.
 - Real Chromium proved accessible-role clicking, labeled extraction, element and URL checkpoints, coordinate mismatch rejection, and missing-checkpoint behavior.
 - All 44 intended tests passed after the adapter regression test was added.
+
+## 2026-09-15 — Live deterministic replay
+
+### Completed
+
+- Added a CLI that loads a saved artifact, parses declared inputs, launches Chromium, invokes `ReplayEngine`, and prints its typed result.
+- Added artifact-aware replay evidence that redacts fields declared sensitive.
+- Added repository tests for CLI input parsing, redaction, and both saved evidence records.
+- Ran success and member-not-found replays from the same saved artifact without an LLM call.
+
+### Live evidence
+
+- Browser preflight: HTTP 200, meaningful page content, one Member ID field, one Search button, and zero console errors.
+- Visual review: the legacy table layout was readable with no visible clipping or blank regions affecting the workflow.
+- Success: all six steps completed and the runtime result returned `$4,250.75`.
+- Business outcome: `member_not_found` returned after fill and search, with no member-open or extraction steps attempted.
+- Server requests corroborated the paths: both runs used GET and POST; only success continued to the opaque member-detail URL.
+- Both saved evidence records passed a search for the input member IDs and extracted balance.
+
+### Verification tooling
+
+- The prescribed `agent-browser` executable was unavailable, so the same browser checks were performed with the project's installed Playwright Chromium runtime.
+- This limitation and fallback are explicit; browser verification was not skipped.

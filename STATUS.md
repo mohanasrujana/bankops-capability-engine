@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-09-14
+Last updated: 2026-09-15
 
 ## Current milestone
 
@@ -33,12 +33,14 @@ M2 — Execute deterministic replay on a live UI
 - Validated invocation types, safely bound declared inputs, enforced the entrypoint allowlist, detected business outcomes, and verified final checkpoints.
 - Accepted ADR-002 defining ownership between replay semantics and UI-specific adapters.
 - Implemented and tested the Playwright surface adapter for semantic locators, CSS fallback, viewport-validated coordinate clicks, UI actions, extraction, and checkpoints.
+- Added a runnable replay CLI and artifact-aware redacted evidence records.
+- Replayed the saved capability in live Chromium against LedgerDesk for both success and member-not-found outcomes.
 - Recreated the project-identity behavior in Python and passed formatting, linting, strict typing, and two tests.
 - Installed and verified the Python runtime/development dependencies in the isolated environment.
 
 ## Next
 
-- Run the reviewed artifact end to end against live LedgerDesk and save replay evidence.
+- Add structured action logging, failure screenshots or traces, and bounded recovery policy.
 
 ## Blocked
 
@@ -49,7 +51,7 @@ M2 — Execute deterministic replay on a live UI
 
 - Local repository: `/Users/satyasrujanapilli/Downloads/bankops-capability-engine`.
 - Git remote: `https://github.com/mohanasrujana/bankops-capability-engine.git`.
-- Local `main` and `origin/main` both point to replay-core commit `90447e4`; Playwright-adapter work is not yet committed.
+- Local `main` and `origin/main` both point to Playwright-adapter commit `5b560ff`; live-replay work is not yet committed.
 - Python baseline evidence: dependency validation, Ruff formatting and lint, strict mypy, and six pytest tests passed.
 - LedgerDesk domain evidence: all six expected Python tests were collected and passed.
 - LedgerDesk health-endpoint evidence: seven total tests passed; the known Starlette/AnyIO warning is narrowly mitigated and documented.
@@ -62,6 +64,9 @@ M2 — Execute deterministic replay on a live UI
 - Saved-artifact evidence: 33 intended tests passed, including loading the repository JSON through the production Pydantic contract.
 - Replay-core evidence: 39 intended tests passed, including success, business outcome, invalid invocation, allowlist rejection, surface failure context, and missing final checkpoint.
 - Playwright-adapter evidence: 44 intended tests passed, including real-Chromium locator fallback, role click, extraction, checkpoints, and coordinate safety.
+- Live replay evidence: known-member replay completed six steps and returned `$4,250.75`; unknown-member replay stopped after search with `member_not_found`.
+- Stored replay evidence replaces the sensitive-designated member ID and balance with `[REDACTED]`.
+- Browser preflight returned HTTP 200, found the expected field and button, had meaningful content, showed no visual clipping, and reported zero console errors.
 - `pip check` reported no broken requirements; FastAPI, Jinja2, OpenAI, Playwright, Pydantic, and Uvicorn imported successfully.
 
 ## Working agreement

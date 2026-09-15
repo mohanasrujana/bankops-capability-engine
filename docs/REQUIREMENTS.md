@@ -22,11 +22,11 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 
 ## Deterministic replay
 
-- [ ] **REP-01:** Replay a saved artifact without LLM decision-making.
+- [x] **REP-01:** Replay a saved artifact without LLM decision-making.
 - [x] **REP-02:** Substitute invocation parameters safely.
 - [x] **REP-03:** Wait for and verify expected UI states.
-- [ ] **REP-04:** Verify the final checkpoint.
-- [ ] **REP-05:** Return declared outputs in a structured result.
+- [x] **REP-04:** Verify the final checkpoint.
+- [x] **REP-05:** Return declared outputs in a structured result.
 
 ## Errors and outcomes
 
@@ -38,17 +38,17 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 
 ## Safety
 
-- [ ] **SAFE-01:** Enforce an allowlist of permitted targets and actions.
-- [ ] **SAFE-02:** Classify safe, reversible, risky, and irreversible actions.
+- [x] **SAFE-01:** Enforce an allowlist of permitted targets and actions.
+- [x] **SAFE-02:** Classify safe, reversible, risky, and irreversible actions.
 - [ ] **SAFE-03:** Block or require confirmation for risky actions.
-- [ ] **SAFE-04:** Keep credentials, tokens, and raw sensitive data out of artifacts.
+- [x] **SAFE-04:** Keep credentials, tokens, and raw sensitive data out of artifacts.
 - [ ] **SAFE-05:** Redact sensitive values from logs.
 
 ## Observability
 
 - [ ] **OBS-01:** Produce structured logs of actions and decisions.
 - [ ] **OBS-02:** Capture a screenshot, trace, or equivalent rich signal on failure.
-- [ ] **OBS-03:** Generate evidence for discovery and replay runs.
+- [ ] **OBS-03:** Generate evidence for discovery and replay runs. Replay evidence is implemented; discovery evidence remains.
 
 ## Human handoff
 
@@ -73,5 +73,5 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 - [ ] **DEL-03:** Provide `/REPORT.md` using the seven required headings.
 - [x] **DEL-04:** Store a saved example artifact under `/evidence/`.
 - [ ] **DEL-05:** Store discovery and replay logs under `/evidence/`.
-- [ ] **DEL-06:** Demonstrate at least one exceptional replay outcome.
+- [x] **DEL-06:** Demonstrate at least one exceptional replay outcome.
 - [ ] **DEL-07:** Keep secrets and real PII out of the repository.

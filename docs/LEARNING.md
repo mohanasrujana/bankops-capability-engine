@@ -100,3 +100,11 @@
 - A coordinate has meaning only relative to the viewport in which it was recorded.
 - The adapter refuses a coordinate click if the current viewport is absent or differs from the recorded dimensions.
 - It also verifies that the point lies inside those dimensions, preferring a safe failure over an unintended click.
+
+## Deterministic replay evidence
+
+- “No LLM during replay” means every decision comes from the validated artifact and replay code; the browser run does not call the OpenAI SDK.
+- A business outcome is not a failed automation: the UI reached a declared, expected state and replay returned its stable outcome code.
+- Completed step IDs prove where execution stopped. The not-found run contains only fill and search, demonstrating that later actions were not attempted.
+- Redaction follows artifact metadata rather than hard-coded field names, so newly declared sensitive inputs and outputs receive the same protection.
+- Runtime output may show synthetic demo data, while saved evidence retains the structural proof with sensitive-designated values removed.
