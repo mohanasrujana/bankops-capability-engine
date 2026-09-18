@@ -37,3 +37,15 @@ Only issues affecting behavior, correctness, safety, maintainability, developer 
 - **Fix:** Explicitly reject a missing viewport before checking its width, height, and coordinate bounds.
 - **Prevention:** Keep strict typing enabled and test coordinate fallback against a mismatched viewport.
 - **Evidence:** Strict mypy passed, and real-Chromium integration testing confirmed viewport mismatch raises `SurfaceError` without clicking.
+
+## BUG-004: Replay logging helper weakened the typed event contract
+
+- **Status:** Fixed
+- **Discovered:** 2026-09-18
+- **Severity:** Maintainability defect
+- **Symptom:** Strict mypy rejected forwarding `dict[str, object]` through the engine's internal event helper.
+- **Cause:** The first helper accepted arbitrary keyword fields even though `ReplayEventRecorder.record` has a fixed typed contract.
+- **Impact:** Incorrect event field names or types could evade static checking inside replay orchestration.
+- **Fix:** Replaced the arbitrary field bag with explicit typed parameters for step, action, input/output names, outcome, and error code.
+- **Prevention:** Preserve typed boundaries between orchestration and observability; avoid generic metadata dictionaries for stable event schemas.
+- **Evidence:** Strict mypy passed across 22 source files, and replay event tests passed.

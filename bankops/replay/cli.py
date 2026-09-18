@@ -2,12 +2,13 @@ import argparse
 import asyncio
 from pathlib import Path
 
-from playwright.async_api import async_playwright
+from playwright.async_api import Page, async_playwright
 
 from bankops.artifacts.models import CapabilityArtifact, ValueType
+from bankops.logging.replay import JsonlEventSink, ReplayEventRecorder
 from bankops.replay.engine import ReplayEngine
 from bankops.replay.evidence import create_replay_evidence
-from bankops.replay.models import ReplayValue
+from bankops.replay.models import ReplayResult, ReplayStatus, ReplayValue
 from bankops.surfaces.playwright import PlaywrightSurfaceAdapter
 
 
@@ -22,6 +23,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Capability input; repeat for multiple values",
     )
     parser.add_argument("--evidence", type=Path)
+    parser.add_argument("--log", type=Path)
+    parser.add_argument("--failure-screenshot", type=Path)
     parser.add_argument("--headed", action="store_true")
     return parser
 
@@ -65,7 +68,11 @@ async def run(args: argparse.Namespace) -> int:
     async with async_playwright() as playwright:
         browser = await playwright.chromium.launch(headless=not args.headed)
         page = await browser.new_page(viewport={"width": 1280, "height": 720})
-        result = await ReplayEngine(PlaywrightSurfaceAdapter(page)).replay(artifact, inputs)
+        recorder = ReplayEventRecorder(JsonlEventSink(args.log)) if args.log is not None else None
+        result = await ReplayEngine(PlaywrightSurfaceAdapter(page), recorder=recorder).replay(
+            artifact, inputs
+        )
+        await capture_failure_screenshot(page, args.failure_screenshot, result)
         await browser.close()
 
     print(result.model_dump_json(indent=2))
@@ -74,6 +81,18 @@ async def run(args: argparse.Namespace) -> int:
         args.evidence.parent.mkdir(parents=True, exist_ok=True)
         args.evidence.write_text(evidence.model_dump_json(indent=2) + "\n")
     return 0 if result.status in {"success", "business_outcome"} else 1
+
+
+async def capture_failure_screenshot(
+    page: Page,
+    path: Path | None,
+    result: ReplayResult,
+) -> bool:
+    if result.status is not ReplayStatus.FAILURE or path is None:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    await page.screenshot(path=path, full_page=True)
+    return True
 
 
 def main() -> int:

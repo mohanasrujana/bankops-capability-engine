@@ -35,12 +35,14 @@ M2 — Execute deterministic replay on a live UI
 - Implemented and tested the Playwright surface adapter for semantic locators, CSS fallback, viewport-validated coordinate clicks, UI actions, extraction, and checkpoints.
 - Added a runnable replay CLI and artifact-aware redacted evidence records.
 - Replayed the saved capability in live Chromium against LedgerDesk for both success and member-not-found outcomes.
+- Added value-free structured JSONL replay events and opt-in full-page failure screenshots.
+- Saved and audited a 14-event live success log under `evidence/replay/`.
 - Recreated the project-identity behavior in Python and passed formatting, linting, strict typing, and two tests.
 - Installed and verified the Python runtime/development dependencies in the isolated environment.
 
 ## Next
 
-- Add structured action logging, failure screenshots or traces, and bounded recovery policy.
+- Add bounded recovery policy and risky-action approval before implementing LLM discovery.
 
 ## Blocked
 
@@ -67,6 +69,7 @@ M2 — Execute deterministic replay on a live UI
 - Live replay evidence: known-member replay completed six steps and returned `$4,250.75`; unknown-member replay stopped after search with `member_not_found`.
 - Stored replay evidence replaces the sensitive-designated member ID and balance with `[REDACTED]`.
 - Browser preflight returned HTTP 200, found the expected field and button, had meaningful content, showed no visual clipping, and reported zero console errors.
+- Observability evidence: the live JSONL log contains one run ID and contiguous events 1–14 without the member ID or extracted balance; Chromium verified failure screenshots are valid PNG files.
 - `pip check` reported no broken requirements; FastAPI, Jinja2, OpenAI, Playwright, Pydantic, and Uvicorn imported successfully.
 
 ## Working agreement

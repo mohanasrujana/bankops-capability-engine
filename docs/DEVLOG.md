@@ -230,3 +230,27 @@
 
 - The prescribed `agent-browser` executable was unavailable, so the same browser checks were performed with the project's installed Playwright Chromium runtime.
 - This limitation and fallback are explicit; browser verification was not skipped.
+
+## 2026-09-18 — Structured replay observability
+
+### Completed
+
+- Added immutable typed replay events with run IDs and contiguous sequence numbers.
+- Added JSONL output for run, step, business-outcome, completion, and failure events.
+- Logged only input/output names, step IDs, action kinds, outcome codes, and error codes—not runtime values.
+- Added optional full-page screenshots when CLI replay returns failure.
+- Fixed BUG-004 by keeping the engine-to-recorder helper fully typed.
+
+### Live evidence
+
+- Reverified LedgerDesk in Chromium before replay: HTTP 200, expected controls, meaningful content, and zero console errors.
+- Generated `evidence/replay/success.jsonl` from a live six-step replay.
+- The file contains 14 events under one run ID with contiguous sequence numbers.
+- A repository audit found neither the input member ID nor the extracted balance in the log.
+- Server logs showed the expected GET, POST, and opaque member-detail GET before clean shutdown.
+
+### Verification
+
+- Unit tests cover event sequencing, value exclusion, and parseable one-event-per-line JSONL.
+- Replay tests prove events wrap the actual deterministic step execution.
+- Real Chromium testing proves failed runs can produce a valid PNG screenshot.

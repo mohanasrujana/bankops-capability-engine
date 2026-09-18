@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from bankops.artifacts.models import CapabilityArtifact, Checkpoint, LocatorPlan
+from bankops.logging.replay import ReplayEvent, ReplayEventRecorder, ReplayEventType
 from bankops.replay.engine import ReplayEngine
 from bankops.replay.models import ReplayStatus
 from bankops.surfaces.base import SurfaceError
@@ -55,6 +56,14 @@ class FakeSurface:
 
     async def wait_for_checkpoint(self, checkpoint: Checkpoint) -> bool:
         return self.final_checkpoint
+
+
+class MemorySink:
+    def __init__(self) -> None:
+        self.events: list[ReplayEvent] = []
+
+    def emit(self, event: ReplayEvent) -> None:
+        self.events.append(event)
 
 
 def load_artifact() -> CapabilityArtifact:
@@ -148,3 +157,21 @@ async def test_replay_requires_final_success_checkpoint() -> None:
     assert result.error.code == "checkpoint_not_met"
     assert result.error.expected == "success checkpoint"
     assert result.error.observed == "checkpoint absent"
+
+
+@pytest.mark.anyio
+async def test_replay_emits_ordered_value_free_events() -> None:
+    sink = MemorySink()
+    recorder = ReplayEventRecorder(sink, run_id="run-1")
+
+    result = await ReplayEngine(FakeSurface(), recorder=recorder).replay(
+        load_artifact(), {"member_id": "M-10001"}
+    )
+
+    assert result.status is ReplayStatus.SUCCESS
+    assert sink.events[0].event_type is ReplayEventType.RUN_STARTED
+    assert sink.events[-1].event_type is ReplayEventType.RUN_COMPLETED
+    assert [event.sequence for event in sink.events] == list(range(1, len(sink.events) + 1))
+    serialized = "\n".join(event.model_dump_json() for event in sink.events)
+    assert "M-10001" not in serialized
+    assert "$4,250.75" not in serialized

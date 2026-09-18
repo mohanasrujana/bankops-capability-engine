@@ -108,3 +108,11 @@
 - Completed step IDs prove where execution stopped. The not-found run contains only fill and search, demonstrating that later actions were not attempted.
 - Redaction follows artifact metadata rather than hard-coded field names, so newly declared sensitive inputs and outputs receive the same protection.
 - Runtime output may show synthetic demo data, while saved evidence retains the structural proof with sensitive-designated values removed.
+
+## Structured observability without data leakage
+
+- A useful action log needs stable identifiers and ordering more than raw field values.
+- Run IDs group events, while contiguous sequence numbers reconstruct exact execution order without relying only on timestamps.
+- Step IDs and action kinds explain what happened; input and output names explain data flow; the corresponding values remain absent.
+- Failure screenshots complement structured events because they preserve unexpected UI state that a step ID alone cannot describe.
+- Typed event fields prevent accidental schema drift and make logging code subject to the same strict checks as replay code.

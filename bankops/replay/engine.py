@@ -10,6 +10,7 @@ from bankops.artifacts.models import (
     ValueType,
     WaitForStep,
 )
+from bankops.logging.replay import ReplayEventRecorder, ReplayEventType
 from bankops.replay.models import ReplayError, ReplayResult, ReplayStatus, ReplayValue
 from bankops.surfaces.base import SurfaceAdapter, SurfaceError
 
@@ -21,19 +22,35 @@ class InvocationError(ValueError):
 
 
 class ReplayEngine:
-    def __init__(self, surface: SurfaceAdapter) -> None:
+    def __init__(
+        self,
+        surface: SurfaceAdapter,
+        recorder: ReplayEventRecorder | None = None,
+    ) -> None:
         self._surface = surface
+        self._recorder = recorder
 
     async def replay(
         self,
         artifact: CapabilityArtifact,
         inputs: Mapping[str, ReplayValue],
     ) -> ReplayResult:
+        self._record(
+            ReplayEventType.RUN_STARTED,
+            artifact,
+            input_names=tuple(sorted(inputs)),
+        )
         try:
             validated_inputs = _validate_inputs(artifact, inputs)
             _require_allowlisted_entrypoint(artifact)
         except InvocationError as error:
-            return self._failure(artifact, "invalid_invocation", str(error))
+            result = self._failure(artifact, "invalid_invocation", str(error))
+            self._record(
+                ReplayEventType.RUN_FAILED,
+                artifact,
+                error_code="invalid_invocation",
+            )
+            return result
 
         outputs: dict[str, ReplayValue] = {}
         completed_steps: list[str] = []
@@ -43,6 +60,12 @@ class ReplayEngine:
             await self._surface.navigate(artifact.compatibility.entrypoint)
             for step in artifact.steps:
                 current_step_id = step.id
+                self._record(
+                    ReplayEventType.STEP_STARTED,
+                    artifact,
+                    step_id=step.id,
+                    action_kind=step.kind,
+                )
                 if isinstance(step, FillStep):
                     value = _render_template(step.value_template, validated_inputs)
                     await self._surface.fill(step.target, value, step.timeout_ms)
@@ -56,18 +79,31 @@ class ReplayEngine:
                     )
 
                 completed_steps.append(step.id)
+                self._record(
+                    ReplayEventType.STEP_COMPLETED,
+                    artifact,
+                    step_id=step.id,
+                    action_kind=step.kind,
+                    output_names=(step.output_name,) if isinstance(step, ExtractStep) else (),
+                )
                 outcome_code = await self._matching_outcome(artifact)
                 if outcome_code is not None:
-                    return ReplayResult(
+                    result = ReplayResult(
                         status=ReplayStatus.BUSINESS_OUTCOME,
                         capability_id=artifact.capability_id,
                         capability_version=artifact.capability_version,
                         outcome_code=outcome_code,
                         completed_step_ids=tuple(completed_steps),
                     )
+                    self._record(
+                        ReplayEventType.BUSINESS_OUTCOME,
+                        artifact,
+                        outcome_code=outcome_code,
+                    )
+                    return result
 
             if not await self._surface.wait_for_checkpoint(artifact.success_checkpoint):
-                return self._failure(
+                result = self._failure(
                     artifact,
                     "checkpoint_not_met",
                     "The final success checkpoint was not observed",
@@ -75,28 +111,72 @@ class ReplayEngine:
                     expected="success checkpoint",
                     observed="checkpoint absent",
                 )
+                self._record(
+                    ReplayEventType.RUN_FAILED,
+                    artifact,
+                    error_code="checkpoint_not_met",
+                )
+                return result
 
-            return ReplayResult(
+            result = ReplayResult(
                 status=ReplayStatus.SUCCESS,
                 capability_id=artifact.capability_id,
                 capability_version=artifact.capability_version,
                 outputs=outputs,
                 completed_step_ids=tuple(completed_steps),
             )
+            self._record(
+                ReplayEventType.RUN_COMPLETED,
+                artifact,
+                output_names=tuple(sorted(outputs)),
+            )
+            return result
         except SurfaceError as error:
-            return self._failure(
+            result = self._failure(
                 artifact,
                 "surface_error",
                 str(error),
                 completed_steps=completed_steps,
                 step_id=current_step_id,
             )
+            self._record(
+                ReplayEventType.RUN_FAILED,
+                artifact,
+                step_id=current_step_id,
+                error_code="surface_error",
+            )
+            return result
 
     async def _matching_outcome(self, artifact: CapabilityArtifact) -> str | None:
         for outcome in artifact.outcomes:
             if await self._surface.checkpoint_is_met(outcome.checkpoint):
                 return outcome.code
         return None
+
+    def _record(
+        self,
+        event_type: ReplayEventType,
+        artifact: CapabilityArtifact,
+        *,
+        step_id: str | None = None,
+        action_kind: str | None = None,
+        input_names: tuple[str, ...] = (),
+        output_names: tuple[str, ...] = (),
+        outcome_code: str | None = None,
+        error_code: str | None = None,
+    ) -> None:
+        if self._recorder is not None:
+            self._recorder.record(
+                event_type,
+                capability_id=artifact.capability_id,
+                capability_version=artifact.capability_version,
+                step_id=step_id,
+                action_kind=action_kind,
+                input_names=input_names,
+                output_names=output_names,
+                outcome_code=outcome_code,
+                error_code=error_code,
+            )
 
     @staticmethod
     def _failure(

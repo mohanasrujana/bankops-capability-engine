@@ -42,12 +42,12 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 - [x] **SAFE-02:** Classify safe, reversible, risky, and irreversible actions.
 - [ ] **SAFE-03:** Block or require confirmation for risky actions.
 - [x] **SAFE-04:** Keep credentials, tokens, and raw sensitive data out of artifacts.
-- [ ] **SAFE-05:** Redact sensitive values from logs.
+- [x] **SAFE-05:** Redact sensitive values from logs.
 
 ## Observability
 
-- [ ] **OBS-01:** Produce structured logs of actions and decisions.
-- [ ] **OBS-02:** Capture a screenshot, trace, or equivalent rich signal on failure.
+- [x] **OBS-01:** Produce structured logs of actions and decisions.
+- [x] **OBS-02:** Capture a screenshot, trace, or equivalent rich signal on failure.
 - [ ] **OBS-03:** Generate evidence for discovery and replay runs. Replay evidence is implemented; discovery evidence remains.
 
 ## Human handoff

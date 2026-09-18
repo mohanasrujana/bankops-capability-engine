@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from playwright.async_api import async_playwright
 
@@ -6,6 +8,8 @@ from bankops.artifacts.models import (
     LocatorPlan,
     UrlCheckpoint,
 )
+from bankops.replay.cli import capture_failure_screenshot
+from bankops.replay.models import ReplayError, ReplayResult, ReplayStatus
 from bankops.surfaces.base import SurfaceError
 from bankops.surfaces.playwright import PlaywrightSurfaceAdapter
 
@@ -127,4 +131,23 @@ async def test_missing_element_checkpoint_returns_false() -> None:
         )
 
         assert await adapter.wait_for_checkpoint(checkpoint) is False
+        await browser.close()
+
+
+@pytest.mark.anyio
+async def test_failed_replay_can_capture_full_page_screenshot(tmp_path: Path) -> None:
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch()
+        page = await browser.new_page()
+        await page.set_content("<h2>Unexpected Error</h2>")
+        screenshot = tmp_path / "failure.png"
+        result = ReplayResult(
+            status=ReplayStatus.FAILURE,
+            capability_id="lookup-member-savings-balance",
+            capability_version=1,
+            error=ReplayError(code="surface_error", message="test failure"),
+        )
+
+        assert await capture_failure_screenshot(page, screenshot, result) is True
+        assert screenshot.read_bytes().startswith(b"\x89PNG")
         await browser.close()

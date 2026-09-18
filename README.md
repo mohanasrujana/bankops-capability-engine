@@ -40,6 +40,18 @@ python -m bankops.replay.cli \
 
 The structured result has status `success`, completes all six recorded steps, and returns `$4,250.75`. No LLM is called during replay.
 
+To write value-free JSONL action events and capture the UI if replay fails:
+
+```bash
+python -m bankops.replay.cli \
+  --artifact evidence/artifacts/ledgerdesk-member-savings-balance.v1.json \
+  --input member_id=M-10001 \
+  --log evidence/replay/local-run.jsonl \
+  --failure-screenshot evidence/replay/local-failure.png
+```
+
+The log stores input and output field names for debugging, never their values. A screenshot is written only when replay returns `failure`.
+
 Run the exceptional business outcome:
 
 ```bash
