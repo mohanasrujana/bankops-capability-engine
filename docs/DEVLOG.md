@@ -254,3 +254,22 @@
 - Unit tests cover event sequencing, value exclusion, and parseable one-event-per-line JSONL.
 - Replay tests prove events wrap the actual deterministic step execution.
 - Real Chromium testing proves failed runs can produce a valid PNG screenshot.
+
+## 2026-09-18 — Bounded recovery and risky-action approval
+
+### Completed
+
+- Added artifact-level retry policy limited to two or three attempts and at most two seconds of delay.
+- Limited automatic recovery to wait and extraction steps; fill and click remain single-attempt.
+- Added typed approval requests and an approval-provider boundary.
+- Added `intervention_required` results containing the blocked step, action kind, risk, and reason.
+- Added retry and intervention events to structured replay logging.
+- Accepted ADR-003.
+
+### Verification
+
+- A fake surface failed the first wait attempt, recovered on attempt two, and emitted one retry event.
+- Schema validation rejected four retry attempts.
+- A risky step without an approval provider stopped before that step executed.
+- The same risky step completed only with an explicitly approving provider.
+- All 58 intended tests, Ruff, strict mypy, dependency, Chromium, and whitespace checks passed.

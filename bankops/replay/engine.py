@@ -1,3 +1,4 @@
+import asyncio
 import re
 from collections.abc import Mapping
 from urllib.parse import urlsplit
@@ -7,11 +8,20 @@ from bankops.artifacts.models import (
     ClickStep,
     ExtractStep,
     FillStep,
+    RetryPolicy,
+    RiskLevel,
     ValueType,
     WaitForStep,
 )
 from bankops.logging.replay import ReplayEventRecorder, ReplayEventType
-from bankops.replay.models import ReplayError, ReplayResult, ReplayStatus, ReplayValue
+from bankops.replay.models import (
+    InterventionRequest,
+    ReplayError,
+    ReplayResult,
+    ReplayStatus,
+    ReplayValue,
+)
+from bankops.safety.approval import ApprovalProvider, ApprovalRequest
 from bankops.surfaces.base import SurfaceAdapter, SurfaceError
 
 _INPUT_REFERENCE = re.compile(r"{{\s*inputs\.([a-z][a-z0-9_]*)\s*}}")
@@ -26,9 +36,11 @@ class ReplayEngine:
         self,
         surface: SurfaceAdapter,
         recorder: ReplayEventRecorder | None = None,
+        approval_provider: ApprovalProvider | None = None,
     ) -> None:
         self._surface = surface
         self._recorder = recorder
+        self._approval_provider = approval_provider
 
     async def replay(
         self,
@@ -60,23 +72,44 @@ class ReplayEngine:
             await self._surface.navigate(artifact.compatibility.entrypoint)
             for step in artifact.steps:
                 current_step_id = step.id
+                if step.risk is RiskLevel.RISKY:
+                    request = ApprovalRequest(
+                        capability_id=artifact.capability_id,
+                        step_id=step.id,
+                        action_kind=step.kind,
+                        risk=step.risk,
+                        description=step.description,
+                    )
+                    approved = (
+                        self._approval_provider is not None
+                        and await self._approval_provider.approve(request)
+                    )
+                    if not approved:
+                        self._record(
+                            ReplayEventType.INTERVENTION_REQUIRED,
+                            artifact,
+                            step_id=step.id,
+                            action_kind=step.kind,
+                        )
+                        return ReplayResult(
+                            status=ReplayStatus.INTERVENTION_REQUIRED,
+                            capability_id=artifact.capability_id,
+                            capability_version=artifact.capability_version,
+                            completed_step_ids=tuple(completed_steps),
+                            intervention=InterventionRequest(
+                                reason="Risky action requires explicit approval",
+                                step_id=step.id,
+                                action_kind=step.kind,
+                                risk=step.risk,
+                            ),
+                        )
                 self._record(
                     ReplayEventType.STEP_STARTED,
                     artifact,
                     step_id=step.id,
                     action_kind=step.kind,
                 )
-                if isinstance(step, FillStep):
-                    value = _render_template(step.value_template, validated_inputs)
-                    await self._surface.fill(step.target, value, step.timeout_ms)
-                elif isinstance(step, ClickStep):
-                    await self._surface.click(step.target, step.timeout_ms)
-                elif isinstance(step, WaitForStep):
-                    await self._surface.wait_for(step.target, step.state, step.timeout_ms)
-                elif isinstance(step, ExtractStep):
-                    outputs[step.output_name] = await self._surface.extract(
-                        step.target, step.source, step.timeout_ms
-                    )
+                await self._execute_with_recovery(artifact, step, validated_inputs, outputs)
 
                 completed_steps.append(step.id)
                 self._record(
@@ -153,6 +186,49 @@ class ReplayEngine:
                 return outcome.code
         return None
 
+    async def _execute_with_recovery(
+        self,
+        artifact: CapabilityArtifact,
+        step: ClickStep | FillStep | ExtractStep | WaitForStep,
+        inputs: Mapping[str, ReplayValue],
+        outputs: dict[str, ReplayValue],
+    ) -> None:
+        retry = step.retry if isinstance(step, ExtractStep | WaitForStep) else None
+        max_attempts = retry.max_attempts if retry is not None else 1
+        for attempt in range(1, max_attempts + 1):
+            try:
+                await self._execute_once(step, inputs, outputs)
+                return
+            except SurfaceError:
+                if attempt == max_attempts:
+                    raise
+                self._record(
+                    ReplayEventType.STEP_RETRY,
+                    artifact,
+                    step_id=step.id,
+                    action_kind=step.kind,
+                    attempt=attempt + 1,
+                )
+                await asyncio.sleep(_retry_delay_seconds(retry))
+
+    async def _execute_once(
+        self,
+        step: ClickStep | FillStep | ExtractStep | WaitForStep,
+        inputs: Mapping[str, ReplayValue],
+        outputs: dict[str, ReplayValue],
+    ) -> None:
+        if isinstance(step, FillStep):
+            value = _render_template(step.value_template, inputs)
+            await self._surface.fill(step.target, value, step.timeout_ms)
+        elif isinstance(step, ClickStep):
+            await self._surface.click(step.target, step.timeout_ms)
+        elif isinstance(step, WaitForStep):
+            await self._surface.wait_for(step.target, step.state, step.timeout_ms)
+        elif isinstance(step, ExtractStep):
+            outputs[step.output_name] = await self._surface.extract(
+                step.target, step.source, step.timeout_ms
+            )
+
     def _record(
         self,
         event_type: ReplayEventType,
@@ -164,6 +240,7 @@ class ReplayEngine:
         output_names: tuple[str, ...] = (),
         outcome_code: str | None = None,
         error_code: str | None = None,
+        attempt: int | None = None,
     ) -> None:
         if self._recorder is not None:
             self._recorder.record(
@@ -176,6 +253,7 @@ class ReplayEngine:
                 output_names=output_names,
                 outcome_code=outcome_code,
                 error_code=error_code,
+                attempt=attempt,
             )
 
     @staticmethod
@@ -253,3 +331,7 @@ def _require_allowlisted_entrypoint(artifact: CapabilityArtifact) -> None:
         if same_origin and path_allowed:
             return
     raise InvocationError("Artifact entrypoint is outside its URL allowlist")
+
+
+def _retry_delay_seconds(policy: RetryPolicy | None) -> float:
+    return 0 if policy is None else policy.delay_ms / 1_000

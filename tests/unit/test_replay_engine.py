@@ -7,6 +7,7 @@ from bankops.artifacts.models import CapabilityArtifact, Checkpoint, LocatorPlan
 from bankops.logging.replay import ReplayEvent, ReplayEventRecorder, ReplayEventType
 from bankops.replay.engine import ReplayEngine
 from bankops.replay.models import ReplayStatus
+from bankops.safety.approval import ApprovalRequest
 from bankops.surfaces.base import SurfaceError
 
 _ARTIFACT_PATH = (
@@ -24,10 +25,13 @@ class FakeSurface:
         outcome: str | None = None,
         fail_on: str | None = None,
         final_checkpoint: bool = True,
+        fail_wait_attempts: int = 0,
     ) -> None:
         self.outcome = outcome
         self.fail_on = fail_on
         self.final_checkpoint = final_checkpoint
+        self.fail_wait_attempts = fail_wait_attempts
+        self.wait_calls = 0
         self.operations: list[tuple[str, str]] = []
 
     async def navigate(self, url: str) -> None:
@@ -42,7 +46,10 @@ class FakeSurface:
             raise SurfaceError("button was not actionable")
 
     async def wait_for(self, target: LocatorPlan, state: str, timeout_ms: int) -> None:
+        self.wait_calls += 1
         self.operations.append(("wait_for", state))
+        if self.wait_calls <= self.fail_wait_attempts:
+            raise SurfaceError("target was temporarily unavailable")
 
     async def extract(self, target: LocatorPlan, source: str, timeout_ms: int) -> str:
         self.operations.append(("extract", source))
@@ -64,6 +71,16 @@ class MemorySink:
 
     def emit(self, event: ReplayEvent) -> None:
         self.events.append(event)
+
+
+class AllowApprovalProvider:
+    def __init__(self, approved: bool) -> None:
+        self.approved = approved
+        self.requests: list[ApprovalRequest] = []
+
+    async def approve(self, request: ApprovalRequest) -> bool:
+        self.requests.append(request)
+        return self.approved
 
 
 def load_artifact() -> CapabilityArtifact:
@@ -175,3 +192,56 @@ async def test_replay_emits_ordered_value_free_events() -> None:
     serialized = "\n".join(event.model_dump_json() for event in sink.events)
     assert "M-10001" not in serialized
     assert "$4,250.75" not in serialized
+
+
+@pytest.mark.anyio
+async def test_replay_retries_only_when_artifact_records_bounded_recovery() -> None:
+    data = json.loads(_ARTIFACT_PATH.read_text())
+    data["steps"][2]["retry"] = {"max_attempts": 2, "delay_ms": 0}
+    artifact = CapabilityArtifact.model_validate(data)
+    surface = FakeSurface(fail_wait_attempts=1)
+    sink = MemorySink()
+
+    result = await ReplayEngine(surface, recorder=ReplayEventRecorder(sink, run_id="run-1")).replay(
+        artifact, {"member_id": "M-10001"}
+    )
+
+    assert result.status is ReplayStatus.SUCCESS
+    assert surface.wait_calls == 3
+    retry_events = [
+        event for event in sink.events if event.event_type is ReplayEventType.STEP_RETRY
+    ]
+    assert len(retry_events) == 1
+    assert retry_events[0].step_id == "wait-for-open-member"
+    assert retry_events[0].attempt == 2
+
+
+@pytest.mark.anyio
+async def test_risky_step_stops_before_execution_without_approval() -> None:
+    data = json.loads(_ARTIFACT_PATH.read_text())
+    data["steps"][0]["risk"] = "risky"
+    artifact = CapabilityArtifact.model_validate(data)
+    surface = FakeSurface()
+
+    result = await ReplayEngine(surface).replay(artifact, {"member_id": "M-10001"})
+
+    assert result.status is ReplayStatus.INTERVENTION_REQUIRED
+    assert result.intervention is not None
+    assert result.intervention.step_id == "enter-member-id"
+    assert surface.operations == [("navigate", "http://127.0.0.1:8000/")]
+
+
+@pytest.mark.anyio
+async def test_risky_step_executes_after_explicit_approval() -> None:
+    data = json.loads(_ARTIFACT_PATH.read_text())
+    data["steps"][0]["risk"] = "risky"
+    artifact = CapabilityArtifact.model_validate(data)
+    approval = AllowApprovalProvider(approved=True)
+
+    result = await ReplayEngine(FakeSurface(), approval_provider=approval).replay(
+        artifact, {"member_id": "M-10001"}
+    )
+
+    assert result.status is ReplayStatus.SUCCESS
+    assert len(approval.requests) == 1
+    assert approval.requests[0].step_id == "enter-member-id"

@@ -74,6 +74,11 @@ class RiskLevel(StrEnum):
     IRREVERSIBLE = "irreversible"
 
 
+class RetryPolicy(StrictModel):
+    max_attempts: int = Field(default=2, ge=2, le=3)
+    delay_ms: int = Field(default=100, ge=0, le=2_000)
+
+
 type StepId = Annotated[
     str,
     Field(min_length=1, pattern=r"^[a-z][a-z0-9-]*$"),
@@ -108,6 +113,7 @@ class ExtractStep(StrictModel):
     source: Literal["text", "value"] = "text"
     risk: RiskLevel = RiskLevel.SAFE
     timeout_ms: int = Field(default=5_000, ge=100, le=30_000)
+    retry: RetryPolicy | None = None
 
 
 class WaitForStep(StrictModel):
@@ -118,6 +124,7 @@ class WaitForStep(StrictModel):
     state: Literal["visible", "hidden", "enabled"] = "visible"
     risk: RiskLevel = RiskLevel.SAFE
     timeout_ms: int = Field(default=5_000, ge=100, le=30_000)
+    retry: RetryPolicy | None = None
 
 
 type ActionStep = Annotated[

@@ -109,3 +109,23 @@ def test_action_timeout_is_bounded() -> None:
                 "timeout_ms": 60_000,
             }
         )
+
+
+def test_retry_attempts_are_bounded() -> None:
+    with pytest.raises(ValidationError, match="less than or equal to 3"):
+        _ACTION_ADAPTER.validate_python(
+            {
+                "kind": "wait_for",
+                "id": "wait-for-member",
+                "description": "Wait with an invalid retry count",
+                "target": {
+                    "candidates": [
+                        {
+                            "kind": "text",
+                            "text": "Member Found",
+                        }
+                    ]
+                },
+                "retry": {"max_attempts": 4, "delay_ms": 0},
+            }
+        )

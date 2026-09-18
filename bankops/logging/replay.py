@@ -15,6 +15,8 @@ class ReplayEventType(StrEnum):
     RUN_STARTED = "run_started"
     STEP_STARTED = "step_started"
     STEP_COMPLETED = "step_completed"
+    STEP_RETRY = "step_retry"
+    INTERVENTION_REQUIRED = "intervention_required"
     BUSINESS_OUTCOME = "business_outcome"
     RUN_COMPLETED = "run_completed"
     RUN_FAILED = "run_failed"
@@ -33,6 +35,7 @@ class ReplayEvent(StrictModel):
     output_names: tuple[str, ...] = ()
     outcome_code: str | None = None
     error_code: str | None = None
+    attempt: int | None = Field(default=None, ge=1)
 
 
 class EventSink(Protocol):
@@ -74,6 +77,7 @@ class ReplayEventRecorder:
         output_names: tuple[str, ...] = (),
         outcome_code: str | None = None,
         error_code: str | None = None,
+        attempt: int | None = None,
     ) -> None:
         self._sequence += 1
         self._sink.emit(
@@ -90,5 +94,6 @@ class ReplayEventRecorder:
                 output_names=output_names,
                 outcome_code=outcome_code,
                 error_code=error_code,
+                attempt=attempt,
             )
         )

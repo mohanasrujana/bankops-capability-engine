@@ -37,12 +37,15 @@ M2 — Execute deterministic replay on a live UI
 - Replayed the saved capability in live Chromium against LedgerDesk for both success and member-not-found outcomes.
 - Added value-free structured JSONL replay events and opt-in full-page failure screenshots.
 - Saved and audited a 14-event live success log under `evidence/replay/`.
+- Implemented artifact-declared bounded retry for wait and extraction steps.
+- Implemented deny-by-default risky-action approval with typed intervention requests.
+- Accepted ADR-003 defining conservative recovery and approval boundaries.
 - Recreated the project-identity behavior in Python and passed formatting, linting, strict typing, and two tests.
 - Installed and verified the Python runtime/development dependencies in the isolated environment.
 
 ## Next
 
-- Add bounded recovery policy and risky-action approval before implementing LLM discovery.
+- Implement the genuine LLM observe-decide-act discovery loop and save discovery evidence.
 
 ## Blocked
 
@@ -70,6 +73,7 @@ M2 — Execute deterministic replay on a live UI
 - Stored replay evidence replaces the sensitive-designated member ID and balance with `[REDACTED]`.
 - Browser preflight returned HTTP 200, found the expected field and button, had meaningful content, showed no visual clipping, and reported zero console errors.
 - Observability evidence: the live JSONL log contains one run ID and contiguous events 1–14 without the member ID or extracted balance; Chromium verified failure screenshots are valid PNG files.
+- Recovery and approval evidence: 58 tests passed, including one transient wait recovery, retry bounds, denial before risky execution, and explicit approval.
 - `pip check` reported no broken requirements; FastAPI, Jinja2, OpenAI, Playwright, Pydantic, and Uvicorn imported successfully.
 
 ## Working agreement

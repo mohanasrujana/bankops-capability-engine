@@ -1,7 +1,13 @@
 from datetime import UTC, datetime
 
 from bankops.artifacts.models import CapabilityArtifact, StrictModel
-from bankops.replay.models import ReplayError, ReplayResult, ReplayStatus, ReplayValue
+from bankops.replay.models import (
+    InterventionRequest,
+    ReplayError,
+    ReplayResult,
+    ReplayStatus,
+    ReplayValue,
+)
 
 _REDACTED = "[REDACTED]"
 
@@ -17,6 +23,7 @@ class ReplayEvidence(StrictModel):
     outcome_code: str | None
     completed_step_ids: tuple[str, ...]
     error: ReplayError | None
+    intervention: InterventionRequest | None = None
 
 
 def create_replay_evidence(
@@ -44,4 +51,5 @@ def create_replay_evidence(
         outcome_code=result.outcome_code,
         completed_step_ids=result.completed_step_ids,
         error=result.error,
+        intervention=result.intervention,
     )

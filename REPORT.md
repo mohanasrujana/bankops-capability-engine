@@ -18,17 +18,19 @@ The surface-independent replay engine validates invocation inputs, binds declare
 
 Replay emits typed JSONL events with a run ID and contiguous sequence numbers around every step. Events contain field names and execution metadata but omit invocation and extracted values. CLI failures can capture a full-page screenshot before the browser session closes.
 
+Recovery is explicit and bounded in the artifact: only wait and extraction steps can record two or three attempts. State-changing clicks are never blindly repeated. Risky steps require affirmative approval through a typed provider boundary; otherwise replay returns `intervention_required` with actionable step context before executing the operation.
+
 ## 4. Heterogeneity & multi-tenant
 
 `SurfaceAdapter` separates semantic actions from browser execution, and the Playwright implementation proves the boundary against Chromium. Application-family metadata and planned tenant-specific overrides allow reuse without claiming that desktop or production multi-tenant infrastructure is implemented.
 
 ## 5. Escalation & handoff
 
-The planned controller transitions through `AUTOMATION`, `WAITING_FOR_HUMAN`, and `HUMAN` while preserving the same Playwright browser context. Verified details will be added after demonstration.
+Replay now detects risky steps and emits typed intervention requests rather than treating them as failures. The next handoff layer will transition between automation and human control while preserving the same Playwright browser context; that same-session control transfer is not yet implemented.
 
 ## 6. Safety
 
-The artifact and replay layers allowlist action kinds and URL origins, classify risk, and reject irreversible reusable actions. Replay evidence uses artifact sensitivity metadata to redact inputs and outputs, while structured logs exclude runtime values entirely. Risky-step approval remains to be implemented. LedgerDesk uses synthetic data only.
+The artifact and replay layers allowlist action kinds and URL origins, classify risk, reject irreversible reusable actions, and require affirmative approval for risky steps. Replay evidence uses artifact sensitivity metadata to redact inputs and outputs, while structured logs exclude runtime values entirely. LedgerDesk uses synthetic data only.
 
 ## 7. Cuts
 

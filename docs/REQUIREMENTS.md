@@ -32,7 +32,7 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 
 - [x] **ERR-01:** Represent successful completion separately from errors.
 - [x] **ERR-02:** Represent expected business outcomes such as "member not found."
-- [ ] **ERR-03:** Detect and retry explicitly recoverable conditions.
+- [x] **ERR-03:** Detect and retry explicitly recoverable conditions.
 - [x] **ERR-04:** Stop with debuggable context on hard failures.
 - [x] **ERR-05:** Identify the failed step, expectation, and observation.
 
@@ -40,7 +40,7 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 
 - [x] **SAFE-01:** Enforce an allowlist of permitted targets and actions.
 - [x] **SAFE-02:** Classify safe, reversible, risky, and irreversible actions.
-- [ ] **SAFE-03:** Block or require confirmation for risky actions.
+- [x] **SAFE-03:** Block or require confirmation for risky actions.
 - [x] **SAFE-04:** Keep credentials, tokens, and raw sensitive data out of artifacts.
 - [x] **SAFE-05:** Redact sensitive values from logs.
 
@@ -52,8 +52,8 @@ Each requirement has a stable ID so code, tests, evidence, and documentation can
 
 ## Human handoff
 
-- [ ] **HITL-01:** Detect when discovery or replay requires human intervention.
-- [ ] **HITL-02:** Create an intervention request containing actionable context.
+- [x] **HITL-01:** Detect when discovery or replay requires human intervention.
+- [x] **HITL-02:** Create an intervention request containing actionable context.
 - [ ] **HITL-03:** Pause automation without closing the live session.
 - [ ] **HITL-04:** Allow a human to control that same session.
 - [ ] **HITL-05:** Record the human's actions.

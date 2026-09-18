@@ -116,3 +116,17 @@
 - Step IDs and action kinds explain what happened; input and output names explain data flow; the corresponding values remain absent.
 - Failure screenshots complement structured events because they preserve unexpected UI state that a step ID alone cannot describe.
 - Typed event fields prevent accidental schema drift and make logging code subject to the same strict checks as replay code.
+
+## Bounded recovery
+
+- A timeout does not prove an action failed; it may mean the response was slow after the action succeeded.
+- Repeating clicks can therefore duplicate a submission, while repeating a wait or read is observation-like and safer.
+- Recovery policy belongs in the artifact so reviewers can see it and replay does not invent behavior dynamically.
+- Attempt and delay limits prevent transient recovery from becoming an unbounded loop.
+
+## Approval as a control state
+
+- `intervention_required` is neither success nor failure: automation intentionally stopped before a risky operation.
+- The approval request contains actionable metadata without input values.
+- Deny-by-default means the absence of an approval mechanism cannot accidentally become permission.
+- This typed request will become the bridge to same-session human handoff later.

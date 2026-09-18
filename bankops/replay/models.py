@@ -2,7 +2,7 @@ from enum import StrEnum
 
 from pydantic import Field
 
-from bankops.artifacts.models import StrictModel
+from bankops.artifacts.models import RiskLevel, StrictModel
 
 type ReplayValue = str | int | float | bool
 
@@ -22,6 +22,13 @@ class ReplayError(StrictModel):
     observed: str | None = None
 
 
+class InterventionRequest(StrictModel):
+    reason: str = Field(min_length=1)
+    step_id: str = Field(min_length=1)
+    action_kind: str = Field(min_length=1)
+    risk: RiskLevel
+
+
 class ReplayResult(StrictModel):
     status: ReplayStatus
     capability_id: str = Field(min_length=1)
@@ -30,3 +37,4 @@ class ReplayResult(StrictModel):
     outcome_code: str | None = None
     completed_step_ids: tuple[str, ...] = ()
     error: ReplayError | None = None
+    intervention: InterventionRequest | None = None
