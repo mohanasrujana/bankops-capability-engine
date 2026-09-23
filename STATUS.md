@@ -1,6 +1,16 @@
 # Project Status
 
-Last updated: 2026-09-15
+Last updated: 2026-09-23
+
+## Latest checkpoint — discovery request contract
+
+- Added `DiscoveryRequest` in `bankops/discovery/models.py` for a nonblank goal, HTTP(S) target, named string inputs, and bounded step/time limits.
+- Reused the artifact model base to reject unknown fields and freeze attribute assignment. Input dictionaries remain mutable; freezing is not deep immutability.
+- Kept input values separate from the goal so later discovery can parameterize recorded actions. Defaults are 15 decisions and 120 seconds, capped at 50 and 300 respectively; these are conservative initial development limits.
+- Reject whitespace-only goals and coercion of execution limits from strings or booleans. URL validation checks syntax only; target policy and runtime limit enforcement belong to the future loop.
+- Verification: 75 tests collected; 69 passed in the sandbox, including all 17 new request cases. The six browser tests initially failed because sandbox permissions blocked Chromium launch, then all six passed with the required access. Ruff formatting/lint and strict mypy passed.
+- This checkpoint does not implement the discovery loop or complete DISC-01. Next: observation and decision contracts.
+- Changes are uncommitted pending the author review checkpoint.
 
 ## Current milestone
 
