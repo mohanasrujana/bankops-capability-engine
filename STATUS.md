@@ -2,7 +2,16 @@
 
 Last updated: 2026-09-23
 
-## Latest checkpoint — discovery request contract
+## Latest checkpoint — discovery observation and decision contracts
+
+- Verified request-contract commit `9b4492c` and a clean working tree before starting.
+- Added bounded visible-text observations with an explicit truncation flag, plus discriminated action, success-proposal, and stop decisions.
+- Reused existing action and checkpoint contracts. Model proposals do not bypass execution policy or establish verified success; timeouts and step-limit stops remain engine-owned.
+- Verification: 86 non-browser tests passed, including 17 new observation/decision cases; Ruff formatting/lint and strict mypy passed. The six browser integration tests were not rerun for this schema-only change.
+- Next: implement bounded browser observation collection. The genuine model loop and discovery evidence remain unfinished.
+- Changes are uncommitted pending author review.
+
+## Previous checkpoint — discovery request contract
 
 - Added `DiscoveryRequest` in `bankops/discovery/models.py` for a nonblank goal, HTTP(S) target, named string inputs, and bounded step/time limits.
 - Reused the artifact model base to reject unknown fields and freeze attribute assignment. Input dictionaries remain mutable; freezing is not deep immutability.
