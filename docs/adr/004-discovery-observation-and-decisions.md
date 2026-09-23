@@ -41,3 +41,20 @@ content. They are not redacted evidence and must not be logged directly. Type
 validation is not authorization or prompt-injection protection. Frozen models
 are not deeply immutable. SDK structured-output compatibility will be checked
 when the provider is implemented; these internal contracts make no such claim.
+
+## Collector checkpoint
+
+`PlaywrightObservationCollector` owns perception separately from the replay
+adapter so deterministic execution does not acquire a discovery dependency.
+One browser evaluation captures URL, title, and rendered main-document body text.
+It returns only the bounded strings, using Unicode code points to match Python
+length validation. The browser still computes the full text before slicing;
+this is a model-input/transfer bound, not a DOM memory bound.
+
+A five-second asynchronous deadline prevents waiting indefinitely on observation;
+the future loop must also enforce its remaining overall time budget. Collection
+does not navigate, retry, or change the page. It excludes ordinary hidden content
+through rendered-text semantics, but is not a sensitive-data redaction mechanism.
+It does not cover iframe documents or provide accessible control metadata yet.
+Real-browser tests exercise behavior on routed HTTP fixtures without requiring
+an external website or model API key.

@@ -2,7 +2,17 @@
 
 Last updated: 2026-09-23
 
-## Latest checkpoint — discovery observation and decision contracts
+## Latest checkpoint — browser observation collection
+
+- Verified observation/decision commit `524b840` and a clean working tree before starting.
+- Added `PlaywrightObservationCollector` to collect the current HTTP(S) URL, title, and rendered main-document text without navigating or modifying the page.
+- Collection has a five-second deadline; title/text are truncated in the browser at Unicode character boundaries with an explicit truncation flag.
+- Browser errors, invalid snapshots, and timeouts map to a stable `SurfaceError`. Raw observations and chained exception details remain unsuitable for direct logging.
+- Verification: all 100 tests passed, including eight new Chromium cases for rendered versus hidden text, unchanged input values, Unicode size boundaries, empty/hidden pages, closed pages, and non-HTTP pages. Ruff and strict mypy passed.
+- Next: structured control observations so a model can identify actionable controls reliably. A visible-text collector alone does not implement genuine discovery or prove DISC-03 complete.
+- Changes are uncommitted pending author review.
+
+## Previous checkpoint — discovery observation and decision contracts
 
 - Verified request-contract commit `9b4492c` and a clean working tree before starting.
 - Added bounded visible-text observations with an explicit truncation flag, plus discriminated action, success-proposal, and stop decisions.
