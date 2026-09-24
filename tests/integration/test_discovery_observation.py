@@ -5,6 +5,7 @@ from playwright.async_api import Page, async_playwright
 
 from bankops.discovery.observation import PlaywrightObservationCollector
 from bankops.surfaces.base import SurfaceError
+from bankops.surfaces.playwright import PlaywrightSurfaceAdapter
 
 
 @pytest.fixture
@@ -87,3 +88,81 @@ async def test_non_http_page_returns_surface_error(observation_page: Page) -> No
     await observation_page.goto("about:blank")
     with pytest.raises(SurfaceError, match="^Unable to collect discovery observation$"):
         await PlaywrightObservationCollector(observation_page).observe()
+
+
+@pytest.mark.anyio
+async def test_control_metadata_and_observed_locators_work(observation_page: Page) -> None:
+    await observation_page.set_content(
+        '<label for="member">Member ID</label><input id="member" value="private sentinel">'
+        '<textarea aria-label="Notes" readonly>private notes</textarea>'
+        '<select aria-label="Account"><option>Savings</option></select>'
+        "<button onclick=\"document.title='searched'\">Search</button>"
+        '<a href="/members">Open Member</a>'
+        '<input type="password" aria-label="Password" value="secret sentinel">'
+        '<input type="hidden" value="hidden sentinel">'
+        '<button hidden>Hidden</button><button style="visibility:hidden">Invisible</button>'
+        '<fieldset disabled><input aria-label="Disabled field"></fieldset>'
+        '<div aria-disabled="true"><button>Disabled button</button></div>'
+    )
+    result = await PlaywrightObservationCollector(observation_page).observe()
+    controls = {control.name_hint: control for control in result.controls}
+    assert set(controls) == {
+        "Member ID",
+        "Notes",
+        "Account",
+        "Search",
+        "Open Member",
+        "Password",
+        "Disabled field",
+        "Disabled button",
+    }
+    assert controls["Notes"].readonly
+    assert controls["Disabled field"].disabled
+    assert controls["Disabled button"].disabled
+    assert controls["Password"].input_type == "password"
+    assert not controls["Member ID"].disabled
+    assert all("sentinel" not in control.model_dump_json() for control in result.controls)
+    for control in result.controls:
+        candidate = control.target.candidates[0]
+        assert candidate.kind == "css"
+        assert await observation_page.locator(candidate.selector).count() == 1
+
+    adapter = PlaywrightSurfaceAdapter(observation_page)
+    await adapter.fill(controls["Member ID"].target, "M-10001", 500)
+    await adapter.click(controls["Search"].target, 500)
+    assert await observation_page.locator("#member").input_value() == "M-10001"
+    assert await observation_page.title() == "searched"
+
+
+@pytest.mark.anyio
+async def test_duplicate_names_have_distinct_targets(observation_page: Page) -> None:
+    await observation_page.set_content(
+        "<button>Open</button><div><button onclick=\"document.title='second'\">Open</button></div>"
+    )
+    result = await PlaywrightObservationCollector(observation_page).observe()
+    assert [control.name_hint for control in result.controls] == ["Open", "Open"]
+    assert result.controls[0].target != result.controls[1].target
+    await PlaywrightSurfaceAdapter(observation_page).click(result.controls[1].target, 500)
+    assert await observation_page.title() == "second"
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("count", [100, 101])
+async def test_control_count_is_bounded(observation_page: Page, count: int) -> None:
+    await observation_page.set_content("<button>Go</button>" * count)
+    result = await PlaywrightObservationCollector(observation_page).observe()
+    assert len(result.controls) == min(count, 100)
+    assert result.truncated == (count > 100)
+
+
+@pytest.mark.anyio
+async def test_control_label_references_and_unicode_limit(observation_page: Page) -> None:
+    await observation_page.set_content(
+        '<span id="first">Member</span><span id="second">ID</span>'
+        '<input aria-labelledby="first second" aria-label="Other">'
+        f'<input aria-label="{"🪙" * 501}">'
+    )
+    result = await PlaywrightObservationCollector(observation_page).observe()
+    assert result.controls[0].name_hint == "Member ID"
+    assert result.controls[1].name_hint == "🪙" * 500
+    assert result.truncated

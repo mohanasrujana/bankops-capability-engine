@@ -2,7 +2,17 @@
 
 Last updated: 2026-09-23
 
-## Latest checkpoint — browser observation collection
+## Latest checkpoint — structured native control observations
+
+- Verified collector commit `e1bf3b7` and a clean working tree before starting.
+- Added typed native-control observations: element tag, input type, bounded name hint, locator plan, disabled state, and readonly state.
+- The collector includes up to 100 rendered inputs, textareas, selects, buttons, and links. It omits hidden controls, marks truncation, and derives name hints from label references, ARIA labels, associated labels, text, or placeholders without directly reading input values.
+- Structural CSS locators distinguish duplicate names and can be consumed by the existing surface adapter. They describe the current DOM snapshot, not durable semantic identity across page changes.
+- Verification: all 105 tests passed, including real-Chromium tests that use observed locators to fill and click, distinguish duplicate names, and verify label precedence, hidden/disabled/readonly controls, Unicode label limits, and control-count bounds. Ruff formatting/lint, strict mypy, and whitespace checks passed.
+- Next: discovery decision-provider integration and bounded orchestration. Genuine LLM discovery and saved discovery evidence remain unfinished.
+- Changes are uncommitted pending author review.
+
+## Previous checkpoint — browser observation collection
 
 - Verified observation/decision commit `524b840` and a clean working tree before starting.
 - Added `PlaywrightObservationCollector` to collect the current HTTP(S) URL, title, and rendered main-document text without navigating or modifying the page.

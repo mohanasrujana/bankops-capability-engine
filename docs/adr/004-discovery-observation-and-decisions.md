@@ -58,3 +58,27 @@ through rendered-text semantics, but is not a sensitive-data redaction mechanism
 It does not cover iframe documents or provide accessible control metadata yet.
 Real-browser tests exercise behavior on routed HTTP fixtures without requiring
 an external website or model API key.
+
+## Structured native controls checkpoint
+
+Observations now carry up to 100 rendered native inputs, textareas, selects,
+buttons, and links, each with a tag, input type, name hint, disabled/readonly
+flags, and a locator plan. Name hints use label references, ARIA labels,
+associated labels, button/link text, then placeholders, bounded to 500 Unicode
+characters. Truncation of either names or the control list marks the observation
+as truncated. Input values are not directly read into control metadata. This
+does not guarantee redaction: labels, text, and other page content may contain
+sensitive information.
+
+Use structural CSS paths, capped at 4096 characters, rather than treating a
+heuristic name hint as a verified accessible name. Overlong paths are omitted
+and mark the observation truncated. Paths avoid collisions between duplicate
+labels and can be executed by the existing adapter; they can become stale after
+DOM changes. Future artifact emission should prefer verified semantic locators
+where available. This checkpoint does not claim durable selectors or implement
+the full accessible-name algorithm, custom ARIA widgets, shadow DOM, or frames.
+
+Disabled and readonly metadata informs a future decision provider; it does not
+authorize an action. The adapter and execution policy must still check a proposed
+action against current state. Tests demonstrate actual fill/click operations
+using collected targets and confirm duplicate-name targets remain distinct.

@@ -2,7 +2,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field, HttpUrl, StringConstraints
 
-from bankops.artifacts.models import ActionStep, Checkpoint, StrictModel
+from bankops.artifacts.models import ActionStep, Checkpoint, LocatorPlan, StrictModel
 
 
 class DiscoveryRequest(StrictModel):
@@ -15,6 +15,17 @@ class DiscoveryRequest(StrictModel):
     timeout_seconds: int = Field(default=120, ge=1, le=300, strict=True)
 
 
+class ControlObservation(StrictModel):
+    """Native control metadata; name_hint is not a computed accessible name."""
+
+    tag: Literal["input", "textarea", "select", "button", "a"]
+    input_type: str | None = Field(default=None, max_length=100)
+    name_hint: str = Field(max_length=500)
+    target: LocatorPlan
+    disabled: bool = Field(strict=True)
+    readonly: bool = Field(strict=True)
+
+
 class DiscoveryObservation(StrictModel):
     """Bounded visible page state for model input, not a redacted log record."""
 
@@ -22,6 +33,7 @@ class DiscoveryObservation(StrictModel):
     title: str = Field(max_length=500)
     visible_text: str = Field(max_length=20_000)
     truncated: bool = Field(strict=True)
+    controls: tuple[ControlObservation, ...] = Field(default=(), max_length=100)
 
 
 class ActionDecision(StrictModel):
