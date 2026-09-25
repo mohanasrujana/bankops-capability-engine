@@ -2,7 +2,19 @@
 
 Last updated: 2026-09-24
 
-## Latest checkpoint — OpenAI decision provider
+## Latest checkpoint — bounded discovery engine
+
+- Verified provider commit `78794cc` and a clean working tree before starting.
+- Added `DiscoveryEngine`, trusted caller criteria, typed runtime results, observation/provider interfaces, and a deny-by-default authorization boundary for every action.
+- The loop checks URL scopes before navigation and before model calls/actions, checks action kinds, blocks irreversible proposals, binds only complete named-input references, rejects duplicate IDs/outputs, and requires current actionable controls for fill/click.
+- Success requires declared extracted outputs and both caller and model checkpoints. Only caller-declared business outcomes can become verified business results.
+- Decision count and one outer deadline bound the run, including model calls and actions. No automatic action retries occur. The browser session remains caller-owned.
+- Verification: all 146 tests passed, including 31 new engine unit cases and a scripted Chromium discovery flow; Ruff formatting/lint, strict mypy, and whitespace checks passed.
+- This is scripted-provider verification, not a genuine LLM discovery run. URL observation checks are not a browser network/navigation firewall. No live command, production authorizer, artifact emission, or discovery evidence is claimed.
+- Next: LedgerDesk-specific trusted authorization and browser navigation safeguards, followed by the live discovery command.
+- Changes are uncommitted pending author review.
+
+## Previous checkpoint — OpenAI decision provider
 
 - Verified native-control commit `9126113` and a clean working tree before starting.
 - Added typed decision context and a provider protocol, plus an OpenAI Responses implementation that returns validated decision proposals without executing browser actions.

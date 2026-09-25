@@ -5,7 +5,7 @@ from typing import Any, Protocol
 from openai import APIError, AsyncOpenAI
 from pydantic import Field, ValidationError
 
-from bankops.artifacts.models import ActionStep, StrictModel
+from bankops.artifacts.models import ActionStep, Checkpoint, StrictModel
 from bankops.discovery.models import DiscoveryDecision, DiscoveryObservation, DiscoveryRequest
 
 
@@ -14,6 +14,8 @@ class DecisionContext(StrictModel):
     observation: DiscoveryObservation
     completed_steps: tuple[ActionStep, ...] = Field(default=(), max_length=50)
     output_names: tuple[str, ...] = Field(default=(), max_length=50)
+    expected_output_names: tuple[str, ...] = Field(default=(), max_length=50)
+    success_checkpoint: Checkpoint | None = None
 
 
 class DecisionEnvelope(StrictModel):
@@ -86,6 +88,12 @@ class OpenAIDecisionProvider:
             "observation": context.observation.model_dump(mode="json"),
             "completed_steps": [step.model_dump(mode="json") for step in context.completed_steps],
             "output_names": context.output_names,
+            "expected_output_names": context.expected_output_names,
+            "success_checkpoint": (
+                context.success_checkpoint.model_dump(mode="json")
+                if context.success_checkpoint is not None
+                else None
+            ),
         }
         try:
             async with asyncio.timeout(30):
