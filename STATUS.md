@@ -1,8 +1,19 @@
 # Project Status
 
-Last updated: 2026-09-23
+Last updated: 2026-09-24
 
-## Latest checkpoint — structured native control observations
+## Latest checkpoint — OpenAI decision provider
+
+- Verified native-control commit `9126113` and a clean working tree before starting.
+- Added typed decision context and a provider protocol, plus an OpenAI Responses implementation that returns validated decision proposals without executing browser actions.
+- Model selection is explicit. Calls use a 30-second deadline, zero automatic retries, a 4096-token output cap, and `store=False`. Runtime input values are omitted from the dedicated request-input payload; observations and history are not redacted.
+- Wrapped decisions in an object and adapted tagged unions to the Structured Outputs schema subset; local Pydantic validation remains authoritative.
+- Verification: 95 non-browser tests passed, including nine new tests through the installed SDK with mocked HTTP transport. Formatting, lint, strict mypy, and whitespace checks passed. Browser tests were not rerun because this checkpoint changes no browser code.
+- No live model request was made. API acceptance of the generated schema and genuine discovery remain unverified.
+- Next: bounded discovery orchestration with execution policy and independent completion checks.
+- Changes are uncommitted pending author review.
+
+## Previous checkpoint — structured native control observations
 
 - Verified collector commit `e1bf3b7` and a clean working tree before starting.
 - Added typed native-control observations: element tag, input type, bounded name hint, locator plan, disabled state, and readonly state.
